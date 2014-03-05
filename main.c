@@ -7,9 +7,8 @@
  * TODO
  */
 
-#include "../Scheduler/scheduler.h"
-#include "../Scheduler/scheduler.c"
-#include "../Hal/hal.h"
+#include<scheduler.h>
+#include<hal.h>
 
 void BlinkLed0() {
 	while(1) {
