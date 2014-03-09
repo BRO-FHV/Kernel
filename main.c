@@ -11,14 +11,10 @@
 #include<hal.h>
 
 void BlinkLed0() {
-	while(1) {
-		GPIO5_OUT ^= LED0;
-	}
+	GPIO5_OUT ^= LED0;
 }
 void BlinkLed1() {
-	while(1) {
-		GPIO5_OUT ^= LED1;
-	}
+	GPIO5_OUT ^= LED1;
 }
 
 int main(void) {
@@ -42,8 +38,6 @@ int main(void) {
 	scheduler_startProcess(BlinkLed1);
 	
 	while(1) {
-		for(i=0; i<0x100000; i++) { }
-
 		scheduler_runNextProcess();
 	}
 }
