@@ -21,9 +21,12 @@ int main(void) {
  * Is called on any interrupt request.
  */
 #pragma INTERRUPT(irq_handle, IRQ)
-#pragma TASK(irq_handle)
 interrupt void irq_handle()
 {
 
+
+}
+
+void xdc_runtime_Startup_reset__I() {
 
 }

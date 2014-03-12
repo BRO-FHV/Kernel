@@ -20,15 +20,15 @@
 ; intvecs.asm as in Example 6-7
 ;****************************************************************************
 
-.global _c_int00
-.global udef_handler
-.global swi_handler
-.global pabt_handler
-.global dabt_handler
-.global irq_handler
-.global fiq_handler
+	.global _c_int00
+	.global udef_handler
+	.global swi_handler
+	.global pabt_handler
+	.global dabt_handler
+	.global irq_handler
+	.global fiq_handler
 
-.sect ".intvecs"
+	.sect ".intvecs"
 
 ; See AM335x Technical Reference Manual.pdf Page 4663 Table 23-10. RAM Exception Vectors
 		B _c_int00		; Reset
