@@ -389,6 +389,16 @@ _stkchk_called:
         .symdepend ".bss", ".text"
 	.endif
 
+;***************************************************************
+;* CONSTANTS USED BY THIS MODULE
+;***************************************************************
+;c_sp_irq		.long	irqStack
+;c_sp_kernel		.long	kernelStack
+;c_sp_abort		.long	abortStack
+;c_sp_system		.long	systemStack
+
+_int_vecs		.long 	int_vecs
+
 ;******************************************************
 ;* UNDEFINED REFERENCES                               *
 ;******************************************************
@@ -396,8 +406,11 @@ _stkchk_called:
 	.global	__STACK_SIZE
 	.global ARGS_MAIN_RTN
 	.global MAIN_FUNC_SP
+
+	.global int_vecs
+
 	.global	EXIT_RTN
 	.global	RESET_FUNC
         .global __TI_auto_init
 
-	.end
+.end

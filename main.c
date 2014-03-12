@@ -8,5 +8,22 @@
  */
 int main(void) {
 	
+	_enable_interrupts();
+
+	while(1) {
+
+	}
 	return 0;
+}
+
+
+/**
+ * Is called on any interrupt request.
+ */
+#pragma INTERRUPT(irq_handle, IRQ)
+#pragma TASK(irq_handle)
+interrupt void irq_handle()
+{
+
+
 }
