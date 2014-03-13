@@ -1,247 +1,83 @@
-;******************************************************************************
-;* BOOT  v4.9.0                                                               *
-;*                                                                            *
-;* Copyright (c) 1996-2011 Texas Instruments Incorporated                     *
-;* http://www.ti.com/                                                         *
-;*                                                                            *
-;*  Redistribution and  use in source  and binary forms, with  or without     *
-;*  modification,  are permitted provided  that the  following conditions     *
-;*  are met:                                                                  *
-;*                                                                            *
-;*     Redistributions  of source  code must  retain the  above copyright     *
-;*     notice, this list of conditions and the following disclaimer.          *
-;*                                                                            *
-;*     Redistributions in binary form  must reproduce the above copyright     *
-;*     notice, this  list of conditions  and the following  disclaimer in     *
-;*     the  documentation  and/or   other  materials  provided  with  the     *
-;*     distribution.                                                          *
-;*                                                                            *
-;*     Neither the  name of Texas Instruments Incorporated  nor the names     *
-;*     of its  contributors may  be used to  endorse or  promote products     *
-;*     derived  from   this  software  without   specific  prior  written     *
-;*     permission.                                                            *
-;*                                                                            *
-;*  THIS SOFTWARE  IS PROVIDED BY THE COPYRIGHT  HOLDERS AND CONTRIBUTORS     *
-;*  "AS IS"  AND ANY  EXPRESS OR IMPLIED  WARRANTIES, INCLUDING,  BUT NOT     *
-;*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR     *
-;*  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT     *
-;*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,     *
-;*  SPECIAL,  EXEMPLARY,  OR CONSEQUENTIAL  DAMAGES  (INCLUDING, BUT  NOT     *
-;*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     *
-;*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY     *
-;*  THEORY OF  LIABILITY, WHETHER IN CONTRACT, STRICT  LIABILITY, OR TORT     *
-;*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE     *
-;*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      *
-;*                                                                            *
-;******************************************************************************
-
-;****************************************************************************
-;* BOOT.ASM
-;*
-;* THIS IS THE INITAL BOOT ROUTINE FOR TMS470 C++ PROGRAMS.
-;* IT MUST BE LINKED AND LOADED WITH ALL C++ PROGRAMS.
-;*
-;* THIS MODULE PERFORMS THE FOLLOWING ACTIONS:
-;*   1) ALLOCATES THE STACK AND INITIALIZES THE STACK POINTER
-;*   2) CALLS AUTO-INITIALIZATION ROUTINE
-;*   3) CALLS THE FUNCTION MAIN TO START THE C++ PROGRAM
-;*   4) CALLS THE STANDARD EXIT ROUTINE
-;*
-;* THIS MODULE DEFINES THE FOLLOWING GLOBAL SYMBOLS:
-;*   1) __stack     STACK MEMORY AREA
-;*   2) _c_int00    BOOT ROUTINE
-;*
-;****************************************************************************
 	.armfunc _c_int00
+    .global _c_int00
 
 ;****************************************************************************
-; Accomodate different lowerd names in different ABIs
+; Entry-Exit Point definition
 ;****************************************************************************
-    .asg	_args_main,   	ARGS_MAIN_RTN
-    .asg	exit,         	EXIT_RTN
-    .asg    main_func_sp,	MAIN_FUNC_SP
+    .asg	_args_main,   ARGS_MAIN_RTN
+    .asg	exit,         EXIT_RTN
+    .asg    main_func_sp, MAIN_FUNC_SP
 
 ;****************************************************************************
-;*  32 BIT STATE BOOT ROUTINE                                               *
+;* DEFINES						                                            *
 ;****************************************************************************
-
-	.global	__stack
-	.global	__irqstack
-	.global	__abortstack
-	.global	__intvecs
-
-;***************************************************************
-;* DEFINE THE USER MODE STACK (DEFAULT SIZE IS 512)            
-;***************************************************************
-__stack:.usect			".stack", 0, 4
-__irqstack:.usect		".irqstack", 512, 4
-__abortstack:.usect		".abortstack", 512, 4
-__intvecs:.usect	".intvecs", 0, 4
-
-	.global	_c_int00
-;***************************************************************
-;* FUNCTION DEF: _c_int00                                      
-;***************************************************************
-_c_int00: .asmfunc
-
-	.if __TI_NEON_SUPPORT__ | __TI_VFP_SUPPORT__
-        ;*------------------------------------------------------
-		;* SETUP PRIVILEGED AND USER MODE ACCESS TO COPROCESSORS
-		;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP
-		;* COPROCESSOR ACCESS CONTROL REG
-		;* BITS [23:22] - CP11, [21:20] - CP10
-		;* SET TO 0b11 TO ENABLE USER AND PRIV MODE ACCESS
-        ;*------------------------------------------------------
-	MRC      p15,#0x0,r0,c1,c0,#2
-        MOV      r3,#0xf00000
-	ORR      r0,r0,r3
-        MCR      p15,#0x0,r0,c1,c0,#2
-
-        ;*------------------------------------------------------
-		; SET THE EN BIT, FPEXC[30] TO ENABLE NEON AND VFP
-        ;*------------------------------------------------------
-      	MOV      r0,#0x40000000
-        FMXR     FPEXC,r0
-	.endif
-
-		;*------------------------------------------------------
-		;* JONATHAN: SET TO IRQ MODE
-        ;*------------------------------------------------------
-		;MRS     r0, cpsr
-        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
-        ;ORR     r0, r0, #0x12  ; SET IRQ MODE
-        ;MSR     cpsr_cf, r0
-		CPS		#0x12
-
-		;*------------------------------------------------------
-        ;* JONATHAN: INITIALIZE THE IRQ MODE STACK
-        ;*------------------------------------------------------
-		LDR		sp, irq_stack
-		LDR		r0, IRQ_STACK_SIZE
-		ADD		sp, sp, r0
-
-		;*------------------------------------------------------
-		;* JONATHAN: SET TO ABORT MODE
-        ;*------------------------------------------------------
-		;MRS     r0, cpsr
-        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
-        ;ORR     r0, r0, #0x17  ; SET IRQ MODE
-        ;MSR     cpsr_cf, r0
-		CPS		#0x17
-
-		;*------------------------------------------------------
-        ;* JONATHAN: INITIALIZE THE ABORT MODE STACK
-        ;*------------------------------------------------------
-		LDR		sp, abort_stack
-		LDR		r0, ABORT_STACK_SIZE
-		ADD		sp, sp, r0
-
-        ;*------------------------------------------------------
-		;* SET TO SYSTEM MODE
-        ;*------------------------------------------------------
-        ;MRS     r0, cpsr
-        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
-        ;ORR     r0, r0, #0x1F  ; SET SYSTEM MODE
-        ;MSR     cpsr_cf, r0
-		CPS		#0x1F
-
-        ;*------------------------------------------------------
-        ;* INITIALIZE THE USER/SYSTEM MODE STACK                      
-        ;*------------------------------------------------------
-		LDR     sp, c_stack
-        LDR     r0, c_STACK_SIZE
-		ADD		sp, sp, r0
-
-	;*-----------------------------------------------------
-	;* ALIGN THE STACK TO 64-BITS IF EABI.
-	;*-----------------------------------------------------
-	.if __TI_EABI_ASSEMBLER
-		BIC     sp, sp, #0x07  ; Clear upper 3 bits for 64-bit alignment.
-	.endif
-
-	;*---------------------------------
-	;* set Vector base address to be 0x40200000
-	; http://e2e.ti.com/support/dsp/omap_applications_processors/f/447/t/29274.aspx
-	;*---------------------------------
-    LDR		r0, intvecs
-    MCR 	p15, #0, r0, c12, c0, #0
-
-	;*-----------------------------------------------------
-	;* SAVE CURRENT STACK POINTER FOR SDP ANALYSIS
-	;*-----------------------------------------------------
-	LDR	r0, c_mf_sp
-	STR	sp, [r0]
-
-    ;*------------------------------------------------------
-    ;* Perform all the required initilizations:
-    ;*   - Process BINIT Table
-    ;*   - Perform C auto initialization
-    ;*   - Call global constructors
-    ;*------------------------------------------------------
-    BL      __TI_auto_init
-
-    ;*------------------------------------------------------
-	;* CALL APPLICATION
-    ;*------------------------------------------------------
-    BL      ARGS_MAIN_RTN
-
-    ;*------------------------------------------------------
-	;* IF APPLICATION DIDN'T CALL EXIT, CALL EXIT(1)
-    ;*------------------------------------------------------
-    MOV     R0, #1
-    BL      EXIT_RTN
-
-    ;*------------------------------------------------------
-	;* DONE, LOOP FOREVER
-    ;*------------------------------------------------------
-L1:     B	L1
-	.endasmfunc
-
-;***************************************************************
-;* CONSTANTS USED BY THIS MODULE
-;***************************************************************
-	.if !__TI_AVOID_EMBEDDED_CONSTANTS
-
-c_stack			.long    __stack
-c_STACK_SIZE  	.long    __STACK_SIZE
-c_mf_sp	        .long    MAIN_FUNC_SP
-
-intvecs			.long	__intvecs
-
-abort_stack			.long	__abortstack
-ABORT_STACK_SIZE 	.long    0x200		; TODO: move to some central constant-pool
-
-irq_stack		.long    __irqstack
-IRQ_STACK_SIZE 	.long    0x200		; TODO: move to some central constant-pool
-
-	.endif
-
-	.if __TI_EABI_ASSEMBLER
-        .data
-        .align 4
-_stkchk_called:
-        .field          0,32
-        .else
-        .sect   ".cinit"
-        .align  4
-        .field          4,32
-        .field          _stkchk_called+0,32
-        .field          0,32
-
-        .bss    _stkchk_called,4,4
-        .symdepend ".cinit", ".bss"
-        .symdepend ".cinit", ".text"
-        .symdepend ".bss", ".text"
-	.endif
-
-;******************************************************
-;* UNDEFINED REFERENCES                               *
-;******************************************************
-	.global _stkchk_called
 	.global	__STACK_SIZE
 	.global ARGS_MAIN_RTN
 	.global MAIN_FUNC_SP
 	.global	EXIT_RTN
 	.global __TI_auto_init
 
-	.end
+	.global intvecs_adr
+	.global irqStack
+	.global abortStack
+	.global systemStack
+
+intvecs_adr:.usect	".intvecs", 0, 4
+irqStack:.usect		".irqStack", 512, 4
+abortStack:.usect	".abortStack", 512, 4
+systemStack:.usect	".systemStack", 0, 4
+
+
+_intvecs_adr		.long	intvecs_adr
+_irqStack			.long	irqStack
+_abortStack			.long	abortStack
+_systemStack		.long	systemStack
+
+;***************************************************************
+;* FUNCTION DEF: _c_int00                                      
+;***************************************************************
+_c_int00: .asmfunc
+        ;*------------------------------------------------------
+        ;* Switch to IRQ Mode and store stack-pointer
+        ;*------------------------------------------------------<
+        CPS		#0x12
+        LDR     sp, _irqStack
+
+        ;*------------------------------------------------------
+        ;* Switch to Abort Mode and store stack-pointer
+        ;*------------------------------------------------------
+        CPS		#0x17
+        LDR     sp, _abortStack
+
+        ;*------------------------------------------------------
+        ;* Switch to System Mode and Store stack-pointer
+        ;*------------------------------------------------------
+        CPS		#0x1F
+        LDR		sp, _systemStack
+
+        ;*------------------------------------------------------
+        ;* Set interrupt vector base address register out of user space
+        ;*------------------------------------------------------
+		LDR R0, _intvecs_adr
+		MCR p15, #0, R0, c12, c0, #0
+
+        ;*------------------------------------------------------
+	    ; Enable Interrupts
+	    ;*------------------------------------------------------
+	    MRS   R12, CPSR
+	    BIC   R12, R12, #192
+	    MSR   CPSR_cf, R12
+
+		;*------------------------------------------------------
+        ;* Perform all the required initilizations:
+        ;*   - Process BINIT Table
+        ;*   - Perform C auto initialization
+        ;*   - Call global constructors
+        ;*------------------------------------------------------
+        BL      __TI_auto_init
+
+        ;*------------------------------------------------------
+        ;* CALL APPLICATION
+        ;*------------------------------------------------------
+        BL      ARGS_MAIN_RTN
+.end

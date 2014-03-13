@@ -8,8 +8,9 @@
 	.global dabt_handler
 	.global irq_handler
 	.global fiq_handler
-
+;****************************************************************************
 ; See AM335x Technical Reference Manual.pdf Page 4663 Table 23-10. RAM Exception Vectors
+;****************************************************************************
 	.sect ".intvecs"
 		B _c_int00		; Reset
 		B udef_handler	; Interrupt Undefined		0x4030CE04
