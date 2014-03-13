@@ -86,11 +86,11 @@ _c_int00: .asmfunc
 
 	.if __TI_NEON_SUPPORT__ | __TI_VFP_SUPPORT__
         ;*------------------------------------------------------
-	;* SETUP PRIVILEGED AND USER MODE ACCESS TO COPROCESSORS
-	;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP      
-	;* COPROCESSOR ACCESS CONTROL REG 
-	;* BITS [23:22] - CP11, [21:20] - CP10
-	;* SET TO 0b11 TO ENABLE USER AND PRIV MODE ACCESS
+		;* SETUP PRIVILEGED AND USER MODE ACCESS TO COPROCESSORS
+		;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP
+		;* COPROCESSOR ACCESS CONTROL REG
+		;* BITS [23:22] - CP11, [21:20] - CP10
+		;* SET TO 0b11 TO ENABLE USER AND PRIV MODE ACCESS
         ;*------------------------------------------------------
 	MRC      p15,#0x0,r0,c1,c0,#2
         MOV      r3,#0xf00000
@@ -98,7 +98,7 @@ _c_int00: .asmfunc
         MCR      p15,#0x0,r0,c1,c0,#2
 
         ;*------------------------------------------------------
-	; SET THE EN BIT, FPEXC[30] TO ENABLE NEON AND VFP
+		; SET THE EN BIT, FPEXC[30] TO ENABLE NEON AND VFP
         ;*------------------------------------------------------
       	MOV      r0,#0x40000000
         FMXR     FPEXC,r0
