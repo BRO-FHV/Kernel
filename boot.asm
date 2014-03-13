@@ -52,237 +52,43 @@
 ;*   2) _c_int00    BOOT ROUTINE
 ;*
 ;****************************************************************************
-   .if  __TI_TMS470_V7M__
-	.thumbfunc _c_int00
-   .else
 	.armfunc _c_int00
-   .endif
 
 ;****************************************************************************
 ; Accomodate different lowerd names in different ABIs
 ;****************************************************************************
-   .if   __TI_EABI_ASSEMBLER
-        .asg	_args_main,   ARGS_MAIN_RTN
-        .asg	exit,         EXIT_RTN
-        .asg    main_func_sp, MAIN_FUNC_SP
-	.asg	xdc_runtime_Startup_reset__I,	RESET_FUNC
-   .elseif __TI_ARM9ABI_ASSEMBLER | .TMS470_32BIS
-        .asg	__args_main,   ARGS_MAIN_RTN
-        .asg	_exit,         EXIT_RTN
-        .asg    _main_func_sp, MAIN_FUNC_SP
-	.asg	_xdc_runtime_Startup_reset__I,	RESET_FUNC
-   .else
-        .asg	$_args_main,   ARGS_MAIN_RTN
-        .asg	$exit,         EXIT_RTN
-        .asg    _main_func_sp, MAIN_FUNC_SP
-	.asg	_xdc_runtime_Startup_reset__I,	RESET_FUNC
-   .endif
-
-   .if .TMS470_16BIS
-
-;****************************************************************************
-;*  16 BIT STATE BOOT ROUTINE                                               *
-;****************************************************************************
-
-   .if __TI_TMS470_V7M__
-	.state16
-   .else
-	.state32
-   .endif
-
-	.global	__stack
-;***************************************************************
-;* DEFINE THE USER MODE STACK (DEFAULT SIZE IS 512)
-;***************************************************************
-__stack:.usect	".stack", 0, 4
-
-	.global	_c_int00
-
-   .if __TI_TMS470_V7M__
-;
-; Add minimal boot vector table
-;
-	.global __STACK_SIZE
-
-	.sect	".bootVecs"
-	.long	__stack		; This really should be __stack + __STACKSIZE
-				; but since c_int00 sets the sp anyway its
-				; ok
-	.long	_c_int00
-
-	.symdepend ".bootVecs", ".text"
-
-	.text
-   .endif
-
-;***************************************************************
-;* FUNCTION DEF: _c_int00
-;***************************************************************
-_c_int00: .asmfunc
-
-	.if !__TI_TMS470_V7M__
-	.if __TI_NEON_SUPPORT__ | __TI_VFP_SUPPORT__
-        ;*------------------------------------------------------
-	;* SETUP PRIVILEGED AND USER MODE ACCESS TO COPROCESSORS
-	;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP
-	;* COPROCESSOR ACCESS CONTROL REG
-	;* BITS [23:22] - CP11, [21:20] - CP10
-	;* SET TO 0b11 TO ENABLE USER AND PRIV MODE ACCESS
-        ;*------------------------------------------------------
-	MRC      p15,#0x0,r0,c1,c0,#2
-        MOV      r3,#0xf00000
-	ORR      r0,r0,r3
-        MCR      p15,#0x0,r0,c1,c0,#2
-
-        ;*------------------------------------------------------
-	; SET THE EN BIT, FPEXC[30] TO ENABLE NEON AND VFP
-        ;*------------------------------------------------------
-      	MOV      r0,#0x40000000
-        FMXR     FPEXC,r0
-	.endif
-
-	;------------------------------------------------------
-	;* SET TO SYSTEM MODE
-        ;*------------------------------------------------------
-        MRS     r0, cpsr
-        BIC     r0, r0, #0x1F  ; CLEAR MODES
-        ORR     r0, r0, #0x1F  ; SET SYSTEM MODE
-        MSR     cpsr_cf, r0
-
-        ;*------------------------------------------------------
-	;* CHANGE TO 16 BIT STATE
-        ;*------------------------------------------------------
-	ADD	r0, pc, #1
-	BX	r0
-
-	.state16
-	.else
-	.if __TI_TMS470_V7M4__ & __TI_VFP_SUPPORT__
-
-	.thumb
-	;*------------------------------------------------------
-	;* SETUP FULL ACCESS TO COPROCESSORS 10 AND 11,
-	;* REQUIRED FOR FP. COPROCESSOR ACCESS CONTROL REG
-	;* BITS [23:22] - CP11, [21:20] - CP10
-	;* SET TO 0b11 TO ENABLE FULL ACCESS
-        ;*------------------------------------------------------
-cpacr   .set     0xE000ED88			; CAPCR address
-	MOVW     r1, #cpacr & 0xFFFF
-	MOVT     r1, #cpacr >> 16
-	LDR      r0, [ r1 ]
-        MOV      r3, #0xf0
-	ORR      r0,r0,r3, LSL #16
-	STR      r0, [ r1 ]
-	.state16
-	.endif
-	.endif
-
-	;*------------------------------------------------------
-        ;* INITIALIZE THE USER/SYSTEM MODE STACK
-        ;*------------------------------------------------------
-	.if __TI_AVOID_EMBEDDED_CONSTANTS
-	.thumb
-	MOVW	r0, __stack
-	MOVT	r0, __stack
-	MOV	sp, r0
-	MOVW	r0, __STACK_SIZE
-	MOVT	r0, __STACK_SIZE
-	.state16
-	.else
-	LDR     r0, c_stack
-	MOV	sp, r0
-        LDR     r0, c_STACK_SIZE
-	.endif
-	ADD	sp, r0
-
-	;*-----------------------------------------------------
-	;* ALIGN THE STACK TO 64-BITS IF EABI.
-	;*-----------------------------------------------------
-	.if __TI_EABI_ASSEMBLER
-	MOV	r7, sp
-	MOV	r0, #0x07
-	BIC     r7, r0         ; Clear upper 3 bits for 64-bit alignment.
-	MOV	sp, r7
-	.endif
-
-	;*-----------------------------------------------------
-	;* SAVE CURRENT STACK POINTER FOR SDP ANALYSIS
-	;*-----------------------------------------------------
-	.if __TI_AVOID_EMBEDDED_CONSTANTS
-	.thumb
-	MOVW	r0, MAIN_FUNC_SP
-	MOVT	r0, MAIN_FUNC_SP
-	.state16
-	.else
-	LDR	r0, c_mf_sp
-	.endif
-	MOV	r7, sp
-	STR	r7, [r0]
-
-	.if __TI_AVOID_EMBEDDED_CONSTANTS
-	MOVW	r0, RESET_FUNC
-	MOVT	r0, RESET_FUNC
-	.state16
-	.else
-	LDR	r0, c_reset
-	.endif
-	CMP	r0, #0
-	BEQ	_no_reset_
-	MOV	r1, pc
-	ADD	r1, r1, #5
-	MOV	lr, r1
-	BX	r0
-
-_no_reset_:
-
-        ;*------------------------------------------------------
-        ;* Perform all the required initilizations:
-        ;*   - Process BINIT Table
-        ;*   - Perform C auto initialization
-        ;*   - Call global constructors
-        ;*------------------------------------------------------
-        BL      __TI_auto_init
-
-        ;*------------------------------------------------------
-	;* CALL APPLICATION
-        ;*------------------------------------------------------
-        BL      ARGS_MAIN_RTN
-
-        ;*------------------------------------------------------
-	;* IF APPLICATION DIDN'T CALL EXIT, CALL EXIT(1)
-        ;*------------------------------------------------------
-        MOV     r0, #1
-        BL      EXIT_RTN
-
-        ;*------------------------------------------------------
-	;* DONE, LOOP FOREVER
-        ;*------------------------------------------------------
-L1:     B	L1
-	.endasmfunc
-
-   .else           ; !.TMS470_16BIS
+    .asg	_args_main,   	ARGS_MAIN_RTN
+    .asg	exit,         	EXIT_RTN
+    .asg    main_func_sp,	MAIN_FUNC_SP
 
 ;****************************************************************************
 ;*  32 BIT STATE BOOT ROUTINE                                               *
 ;****************************************************************************
 
 	.global	__stack
+	.global	__irqstack
+	.global	__abortstack
+	.global	__intvecs
+
 ;***************************************************************
-;* DEFINE THE USER MODE STACK (DEFAULT SIZE IS 512)
+;* DEFINE THE USER MODE STACK (DEFAULT SIZE IS 512)            
 ;***************************************************************
-__stack:.usect	".stack", 0, 4
+__stack:.usect			".stack", 0, 4
+__irqstack:.usect		".irqstack", 512, 4
+__abortstack:.usect		".abortstack", 512, 4
+__intvecs:.usect	".intvecs", 0, 4
 
 	.global	_c_int00
 ;***************************************************************
-;* FUNCTION DEF: _c_int00
+;* FUNCTION DEF: _c_int00                                      
 ;***************************************************************
 _c_int00: .asmfunc
 
 	.if __TI_NEON_SUPPORT__ | __TI_VFP_SUPPORT__
         ;*------------------------------------------------------
 	;* SETUP PRIVILEGED AND USER MODE ACCESS TO COPROCESSORS
-	;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP
-	;* COPROCESSOR ACCESS CONTROL REG
+	;* 10 AND 11, REQUIRED TO ENABLE NEON/VFP      
+	;* COPROCESSOR ACCESS CONTROL REG 
 	;* BITS [23:22] - CP11, [21:20] - CP10
 	;* SET TO 0b11 TO ENABLE USER AND PRIV MODE ACCESS
         ;*------------------------------------------------------
@@ -298,27 +104,67 @@ _c_int00: .asmfunc
         FMXR     FPEXC,r0
 	.endif
 
+		;*------------------------------------------------------
+		;* JONATHAN: SET TO IRQ MODE
         ;*------------------------------------------------------
-	;* SET TO SYSTEM MODE
+		;MRS     r0, cpsr
+        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
+        ;ORR     r0, r0, #0x12  ; SET IRQ MODE
+        ;MSR     cpsr_cf, r0
+		CPS		#0x12
+
+		;*------------------------------------------------------
+        ;* JONATHAN: INITIALIZE THE IRQ MODE STACK
         ;*------------------------------------------------------
-        MRS     r0, cpsr
-        BIC     r0, r0, #0x1F  ; CLEAR MODES
-        ORR     r0, r0, #0x1F  ; SET SYSTEM MODE
-        MSR     cpsr_cf, r0
+		LDR		sp, irq_stack
+		LDR		r0, IRQ_STACK_SIZE
+		ADD		sp, sp, r0
+
+		;*------------------------------------------------------
+		;* JONATHAN: SET TO ABORT MODE
+        ;*------------------------------------------------------
+		;MRS     r0, cpsr
+        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
+        ;ORR     r0, r0, #0x17  ; SET IRQ MODE
+        ;MSR     cpsr_cf, r0
+		CPS		#0x17
+
+		;*------------------------------------------------------
+        ;* JONATHAN: INITIALIZE THE ABORT MODE STACK
+        ;*------------------------------------------------------
+		LDR		sp, abort_stack
+		LDR		r0, ABORT_STACK_SIZE
+		ADD		sp, sp, r0
 
         ;*------------------------------------------------------
-        ;* INITIALIZE THE USER/SYSTEM MODE STACK
+		;* SET TO SYSTEM MODE
         ;*------------------------------------------------------
-	LDR     sp, c_stack
+        ;MRS     r0, cpsr
+        ;BIC     r0, r0, #0x1F  ; CLEAR MODES
+        ;ORR     r0, r0, #0x1F  ; SET SYSTEM MODE
+        ;MSR     cpsr_cf, r0
+		CPS		#0x1F
+
+        ;*------------------------------------------------------
+        ;* INITIALIZE THE USER/SYSTEM MODE STACK                      
+        ;*------------------------------------------------------
+		LDR     sp, c_stack
         LDR     r0, c_STACK_SIZE
-	ADD	sp, sp, r0
+		ADD		sp, sp, r0
 
 	;*-----------------------------------------------------
 	;* ALIGN THE STACK TO 64-BITS IF EABI.
 	;*-----------------------------------------------------
 	.if __TI_EABI_ASSEMBLER
-	BIC     sp, sp, #0x07  ; Clear upper 3 bits for 64-bit alignment.
+		BIC     sp, sp, #0x07  ; Clear upper 3 bits for 64-bit alignment.
 	.endif
+
+	;*---------------------------------
+	;* set Vector base address to be 0x40200000
+	; http://e2e.ti.com/support/dsp/omap_applications_processors/f/447/t/29274.aspx
+	;*---------------------------------
+    LDR		r0, intvecs
+    MCR 	p15, #0, r0, c12, c0, #0
 
 	;*-----------------------------------------------------
 	;* SAVE CURRENT STACK POINTER FOR SDP ANALYSIS
@@ -326,49 +172,48 @@ _c_int00: .asmfunc
 	LDR	r0, c_mf_sp
 	STR	sp, [r0]
 
-	LDR	r0, c_reset
-	CMP	r0, #0
-	BEQ	_no_reset_
-	MOV	lr, pc
-	BX	r0
+    ;*------------------------------------------------------
+    ;* Perform all the required initilizations:
+    ;*   - Process BINIT Table
+    ;*   - Perform C auto initialization
+    ;*   - Call global constructors
+    ;*------------------------------------------------------
+    BL      __TI_auto_init
 
-_no_reset_:
-
-        ;*------------------------------------------------------
-        ;* Perform all the required initilizations:
-        ;*   - Process BINIT Table
-        ;*   - Perform C auto initialization
-        ;*   - Call global constructors
-        ;*------------------------------------------------------
-        BL      __TI_auto_init
-
-        ;*------------------------------------------------------
+    ;*------------------------------------------------------
 	;* CALL APPLICATION
-        ;*------------------------------------------------------
-        BL      ARGS_MAIN_RTN
+    ;*------------------------------------------------------
+    BL      ARGS_MAIN_RTN
 
-        ;*------------------------------------------------------
+    ;*------------------------------------------------------
 	;* IF APPLICATION DIDN'T CALL EXIT, CALL EXIT(1)
-        ;*------------------------------------------------------
-        MOV     R0, #1
-        BL      EXIT_RTN
+    ;*------------------------------------------------------
+    MOV     R0, #1
+    BL      EXIT_RTN
 
-        ;*------------------------------------------------------
+    ;*------------------------------------------------------
 	;* DONE, LOOP FOREVER
-        ;*------------------------------------------------------
+    ;*------------------------------------------------------
 L1:     B	L1
 	.endasmfunc
-
-   .endif    ; !.TMS470_16BIS
 
 ;***************************************************************
 ;* CONSTANTS USED BY THIS MODULE
 ;***************************************************************
 	.if !__TI_AVOID_EMBEDDED_CONSTANTS
-c_stack		.long    __stack
+
+c_stack			.long    __stack
 c_STACK_SIZE  	.long    __STACK_SIZE
 c_mf_sp	        .long    MAIN_FUNC_SP
-c_reset       	.long    RESET_FUNC
+
+intvecs			.long	__intvecs
+
+abort_stack			.long	__abortstack
+ABORT_STACK_SIZE 	.long    0x200		; TODO: move to some central constant-pool
+
+irq_stack		.long    __irqstack
+IRQ_STACK_SIZE 	.long    0x200		; TODO: move to some central constant-pool
+
 	.endif
 
 	.if __TI_EABI_ASSEMBLER
@@ -390,19 +235,13 @@ _stkchk_called:
 	.endif
 
 ;******************************************************
-;* CONSTANTS IN THIS POOL	                          *
-;******************************************************
-_int_vecs		.long 	int_vecs
-;******************************************************
 ;* UNDEFINED REFERENCES                               *
 ;******************************************************
 	.global _stkchk_called
 	.global	__STACK_SIZE
 	.global ARGS_MAIN_RTN
 	.global MAIN_FUNC_SP
-	.global int_vecs
 	.global	EXIT_RTN
-	.global	RESET_FUNC
-        .global __TI_auto_init
+	.global __TI_auto_init
 
 	.end

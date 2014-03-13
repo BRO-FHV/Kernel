@@ -6,3 +6,5 @@
  * Description:
  * TODO
  */
+
+#define HWREG(x)	(*((volatile unsigned int *)(x)))
