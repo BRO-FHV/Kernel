@@ -180,11 +180,11 @@ int main(void) {
 
 	_disable_interrupts();
 
-	puts("config timer\n");
+	printf("config timer\n");
 
 	reg32w(INTC_MIR_CLEAR1, 0, (1 << 6));
 	reg32w(DMTIMER2, TIER, 1);
-	reg32w(DMTIMER2, TMAR, (1 << 22));
+	reg32w(DMTIMER2, TMAR, (1 << 20));
 	reg32w(DMTIMER2, TLDR, 0x00);
 	reg32w(DMTIMER2, TWER, 0x01);
 	reg32w(DMTIMER2, TISR, 0x03);
@@ -194,7 +194,7 @@ int main(void) {
 
 	_enable_interrupts();
 
-	puts("started - now wait!\n");
+	printf("started - now wait!\n");
 
 	while(1) {
 		volatile int i = 0;

@@ -20,7 +20,7 @@ MEMORY
 	// Interrupt IRQ			0x4030CE18
 	// Interrupt FIQ			0x4030CE1C
 	//overriding the branch (load into PC) instruction between addresses from 0x4030CE04 to 0x4030CE1C
-   	int_vecs:	ORIGIN = 0x4030CE00		LENGTH = 0x00000100
+   	int_vecs:	ORIGIN = 0x4030CE04		LENGTH = 0x00000100
     ext_ddr:	ORIGIN = 0x82000000     LENGTH = 0x10000000
 }
 
@@ -28,10 +28,7 @@ SECTIONS
 {
 	// map interrupt-vectors to 0x40200000 instead of 0x4020FFC8 (OMAP35x.pdf at page 3438) because would not
     // fit to memory (overshoot length). so in boot.asm the c12 register is set to 0x40200000
-    .intvecs load = int_vecs {
-		int_vecs = .;
-		*(.intvecs)
-	}
+    .intvecs 	> int_vecs
 
     .const      > ext_ddr
     .bss        > ext_ddr
