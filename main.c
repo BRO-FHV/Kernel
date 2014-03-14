@@ -180,11 +180,14 @@ int main(void) {
 //	_enable_IRQ();
 //	_enable_FIQ();
 
+/*
+ *
+
 	_disable_interrupts();
 
 	printf("config timer\n");
 
-	/* Disable the system interrupt in the corresponding MIR_CLEAR register */
+	// Disable the system interrupt in the corresponding MIR_CLEAR register
 	HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(68 >> 0x05)) =
 			(0x01 << (68 & 0x1F));
 
@@ -201,6 +204,8 @@ int main(void) {
 	_enable_interrupts();
 
 	printf("started - now wait!\n");
+
+	*/
 
 	while (1) {
 		volatile int i = 0;
