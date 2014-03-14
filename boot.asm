@@ -20,18 +20,15 @@
 	.global intvecs_adr
 	.global irqStack
 	.global abortStack
-	.global systemStack
 
 intvecs_adr:.usect	".intvecs", 0, 4
 irqStack:.usect		".irqStack", 512, 4
 abortStack:.usect	".abortStack", 512, 4
-systemStack:.usect	".systemStack", 0, 4
 
 
 _intvecs_adr		.long	intvecs_adr
 _irqStack			.long	irqStack
 _abortStack			.long	abortStack
-_systemStack		.long	systemStack
 
 
 ABORT_STACK_SIZE 	.long    0x1000
@@ -59,8 +56,8 @@ _c_int00: .asmfunc
         ;*------------------------------------------------------
         ;* Set interrupt vector base address register out of user space
         ;*------------------------------------------------------
-		LDR r0, _intvecs_adr
-		MCR p15, #0, r0, c12, c0, #0
+		LDR 	r0, _intvecs_adr
+		MCR		p15, #0, r0, c12, c0, #0
 
         ;*------------------------------------------------------
 	    ; Enable Interrupts
