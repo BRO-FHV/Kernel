@@ -178,6 +178,10 @@ int main(void) {
 //	_enable_IRQ();
 //	_enable_FIQ();
 
+	_disable_interrupts();
+
+	puts("config timer\n");
+
 	reg32w(INTC_MIR_CLEAR1, 0, (1 << 6));
 	reg32w(DMTIMER2, TIER, 1);
 	reg32w(DMTIMER2, TMAR, (1 << 22));
@@ -190,7 +194,7 @@ int main(void) {
 
 	_enable_interrupts();
 
-	printf("started - now wait!");
+	puts("started - now wait!\n");
 
 	while(1) {
 		volatile int i = 0;
