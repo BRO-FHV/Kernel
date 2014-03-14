@@ -211,6 +211,7 @@ int main(void) {
 		volatile int i = 0;
 
 		for (i = 0; i < 1000000; i++) {
+			int i=0;
 		}
 
 	}
