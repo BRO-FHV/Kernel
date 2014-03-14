@@ -163,10 +163,12 @@
 //	(*((volatile unsigned long*)DMTIMER2 + TCLR)) |= 0x02; //autoreload
 //	(*((volatile unsigned long*)DMTIMER2 + TCLR)) |= 0x01; //start
 //}
+#define SOC_AINTC_REGS (0x48200000)
 
+#define INTC_MIR_CLEAR(n) (0x88 + ((n) * 0x20))
 
 int main(void) {
-	
+
 //	printf("disable interrups\n");
 //	_disable_interrupts();
 //	_disable_IRQ();
@@ -182,9 +184,13 @@ int main(void) {
 
 	printf("config timer\n");
 
-	reg32w(INTC_MIR_CLEAR1, 0, (1 << 6));
+	/* Disable the system interrupt in the corresponding MIR_CLEAR register */
+	HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(68 >> 0x05)) =
+			(0x01 << (68 & 0x1F));
+
+	//reg32m(INTC_MIR_CLEAR1, 0, (1 << 6));
 	reg32w(DMTIMER2, TIER, 1);
-	reg32w(DMTIMER2, TMAR, (1 << 20));
+	reg32w(DMTIMER2, TMAR, (1 << 18));
 	reg32w(DMTIMER2, TLDR, 0x00);
 	reg32w(DMTIMER2, TWER, 0x01);
 	reg32w(DMTIMER2, TISR, 0x03);
@@ -196,17 +202,17 @@ int main(void) {
 
 	printf("started - now wait!\n");
 
-	while(1) {
+	while (1) {
 		volatile int i = 0;
 
-		for(i = 0; i < 1000000; i++) {}
+		for (i = 0; i < 1000000; i++) {
+		}
 
 	}
 }
 
 #pragma INTERRUPT(fiq_handler, FIQ)
-interrupt void fiq_handler()
-{
+interrupt void fiq_handler() {
 	printf("fiq interrupt\n");
 }
 
@@ -214,8 +220,7 @@ interrupt void fiq_handler()
  * Is called on any interrupt request.
  */
 #pragma INTERRUPT(irq_handler, IRQ)
-interrupt void irq_handler()
-{
+interrupt void irq_handler() {
 	printf("irq interrupt\n");
 }
 
@@ -223,8 +228,7 @@ interrupt void irq_handler()
  * Is called on any sw interrupt request.
  */
 #pragma INTERRUPT(swi_handler, IRQ)
-interrupt void swi_handler()
-{
+interrupt void swi_handler() {
 	printf("irq interrupt\n");
 }
 
@@ -232,8 +236,7 @@ interrupt void swi_handler()
  * Is called on any undefined error which caused an abort
  */
 #pragma INTERRUPT(udef_handler, UDEF)
-interrupt void udef_handler()
-{
+interrupt void udef_handler() {
 	printf("udef interrupt\n");
 }
 
@@ -241,8 +244,7 @@ interrupt void udef_handler()
  * Is called on any prefetch abort.
  */
 #pragma INTERRUPT(pabt_handler, PABT)
-interrupt void pabt_handler()
-{
+interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
 }
 
@@ -250,7 +252,6 @@ interrupt void pabt_handler()
  * Is called on any data abort.
  */
 #pragma INTERRUPT(dabt_handler, DABT)
-interrupt void dabt_handler()
-{
+interrupt void dabt_handler() {
 	printf("dabt interrupt\n");
 }
