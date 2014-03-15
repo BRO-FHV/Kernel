@@ -13,6 +13,7 @@
 //#include <soc_AM335x.h>
 #include "kernel.h"
 #include <dmtimer.h>
+#include <dr_interrupt.c>
 //
 //static void DMTimerSetUp(void);
 //
@@ -163,9 +164,11 @@
 //	(*((volatile unsigned long*)DMTIMER2 + TCLR)) |= 0x02; //autoreload
 //	(*((volatile unsigned long*)DMTIMER2 + TCLR)) |= 0x01; //start
 //}
-#define SOC_AINTC_REGS (0x48200000)
 
-#define INTC_MIR_CLEAR(n) (0x88 + ((n) * 0x20))
+void IRQHandle68()
+{
+	printf("IRQ 86\n");
+}
 
 int main(void) {
 
@@ -185,8 +188,8 @@ int main(void) {
 	printf("config timer\n");
 
 	/* Disable the system interrupt in the corresponding MIR_CLEAR register */
-	HWREG(SOC_AINTC_REGS + INTC_MIR_CLEAR(68 >> 0x05)) =
-			(0x01 << (68 & 0x1F));
+	IntSystemEnable((unsigned int)68);
+    SetInterrupt(68,IRQHandle68);
 
 	//reg32m(INTC_MIR_CLEAR1, 0, (1 << 6));
 	reg32w(DMTIMER2, TIER, 1);
@@ -221,15 +224,18 @@ interrupt void fiq_handler() {
  */
 #pragma INTERRUPT(irq_handler, IRQ)
 interrupt void irq_handler() {
+	unsigned int irq = reg32r(INTC_SIR_IRQ,0);
 	printf("irq interrupt\n");
+	HandleInterrupt(irq);
 }
+
 
 /**
  * Is called on any sw interrupt request.
  */
 #pragma INTERRUPT(swi_handler, IRQ)
 interrupt void swi_handler() {
-	printf("irq interrupt\n");
+	printf("swi interrupt\n");
 }
 
 /**
