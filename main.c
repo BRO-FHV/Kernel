@@ -29,7 +29,9 @@ static void Delay(unsigned int count);
 
 int main(void) {
 
+	GPIO0ModuleClkConfig();
 	GPIO1ModuleClkConfig();
+	GPIO3ModuleClkConfig();
 
 	// GPIO1Pin23PinMuxSetup();
 
