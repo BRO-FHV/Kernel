@@ -31,7 +31,7 @@ int main(void) {
 
 	GPIO1ModuleClkConfig();
 
-	GPIO1Pin23PinMuxSetup();
+	// GPIO1Pin23PinMuxSetup();
 
 	/* Enabling the GPIO module. */
 	GPIOModuleEnable(GPIO_INSTANCE_ADDRESS);
