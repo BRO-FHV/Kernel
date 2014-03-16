@@ -63,6 +63,8 @@ int main(void) {
 	        Delay(0x3FFFF);
 	    }
 
+	  int i=0;
+
 }
 
 
