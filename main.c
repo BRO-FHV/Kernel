@@ -12,8 +12,10 @@
 //#include <hw_cm_per.h>
 //#include <soc_AM335x.h>
 #include "kernel.h"
-#include <dmtimer.h>
-#include <dr_interrupt.c>
+#include <hw_timer.h>
+#include <basic.h>
+#include <interrupt/dr_interrupt.h>
+#include <hw_interrupt.h>
 //
 //static void DMTimerSetUp(void);
 //
@@ -192,14 +194,14 @@ int main(void) {
     SetInterrupt(68,IRQHandle68);
 
 	//reg32m(INTC_MIR_CLEAR1, 0, (1 << 6));
-	reg32w(DMTIMER2, TIER, 1);
-	reg32w(DMTIMER2, TMAR, (1 << 18));
-	reg32w(DMTIMER2, TLDR, 0x00);
-	reg32w(DMTIMER2, TWER, 0x01);
-	reg32w(DMTIMER2, TISR, 0x03);
-	reg32w(DMTIMER2, TTGR, 0x00);
-	reg32w(DMTIMER2, TCLR, (1 << 6) | 0x03);
-	reg32w(DMTIMER2, TCRR, 0x00);
+	reg32w(TIMER_2, TIMER_IRQENABLE_SET, 1);
+	reg32w(TIMER_2, TIMER_TMAR, (1 << 18));
+	reg32w(TIMER_2, TIMER_TLDR, 0x00);
+	reg32w(TIMER_2, TIMER_IRQWAKEEN, 0x01);
+	reg32w(TIMER_2, TIMER_IRQSTATUS, 0x03);
+	reg32w(TIMER_2, TIMER_TTGR, 0x00);
+	reg32w(TIMER_2, TIMER_TCLR, (1 << 6) | 0x03);
+	reg32w(TIMER_2, TIMER_TCRR, 0x00);
 
 	_enable_interrupts();
 
