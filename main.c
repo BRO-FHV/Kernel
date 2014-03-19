@@ -12,9 +12,9 @@
 //#include <hw_cm_per.h>
 //#include <soc_AM335x.h>
 #include "kernel.h"
-#include <dr_interrupt.h>
-#include <dr_timer.h>
-#include <dr_gpio.h>
+#include <interrupt/dr_interrupt.h>
+#include <timer/dr_timer.h>
+#include <gpio/dr_gpio.h>
 #include <soc_AM335x.h>
 #include <hw_cpu.h>
 
@@ -46,7 +46,6 @@ int main(void) {
 	volatile unsigned int disable = 0;
 	volatile unsigned int wert = (1<<20);
 
-	TimerReset(Timer_TIMER2);
 	TimerBasicConfiguration(Timer_TIMER2, enable, enable, wert, disable, disable, disable, disable);
 	TimerInterruptConfiguration(Timer_TIMER2, IrqMode_MATCH, IrqWakeen_MAT_WUP_ENA, IRQHandle68);
 	TimerEnable(Timer_TIMER2);
@@ -59,7 +58,6 @@ int main(void) {
 
 		for (i = 0; i < 1000000; i++) {
 		}
-
 	}
 }
 
