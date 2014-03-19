@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////
-// Linker command file for BeagleBoard)				  //
+// Linker command file for BeagleBone)				  //
 ////////////////////////////////////////////////////////
 // Basic configuration using only external memory	  //
 ////////////////////////////////////////////////////////
@@ -9,8 +9,11 @@
 
 MEMORY
 {
-    int_ram:	ORIGIN = 0x40200000		LENGTH = 0x0010CD00
-	// Map handler (see ; See AM335x Technical Reference Manual.pdf Page 4663 Table 23-10. RAM Exception Vectors)
+	SRAM:     o = 0x402F0400  l = 0x0000FC00  /* 64kB internal SRAM */
+    L3OCMC0:  o = 0x40300000  l = 0x0000CE00  /* 64kB L3 OCMC SRAM */
+    M3SHUMEM: o = 0x44D00000  l = 0x00004000  /* 16kB M3 Shared Unified Code Space */
+    M3SHDMEM: o = 0x44D80000  l = 0x00002000  /* 8kB M3 Shared Data Memory */
+	// Map handler (See AM335x Technical Reference Manual.pdf Page 4663 Table 23-10. RAM Exception Vectors)
 	// Reserved (Reset)			0x4030CE00
 	// Interrupt Undefined		0x4030CE04
 	// Interrupt SWI			0x4030CE08
@@ -20,29 +23,31 @@ MEMORY
 	// Interrupt IRQ			0x4030CE18
 	// Interrupt FIQ			0x4030CE1C
 	//overriding the branch (load into PC) instruction between addresses from 0x4030CE04 to 0x4030CE1C
-   	int_vecs:	ORIGIN = 0x4030CE04		LENGTH = 0x00000100
-    ext_ddr:	ORIGIN = 0x82000000     LENGTH = 0x10000000
+   	RAMEXC:   o = 0x4030CE04  l = 0x00000100  /* interrups exception mapping */
+    DDR0:     o = 0x80000000  l = 0x40000000  /* 1GB external DDR Bank 0 */
 }
 
 SECTIONS
 {
 	// map interrupt-vectors to 0x40200000 instead of 0x4020FFC8 (OMAP35x.pdf at page 3438) because would not
     // fit to memory (overshoot length). so in boot.asm the c12 register is set to 0x40200000
-    .intvecs 	> int_vecs
+    .intvecs 	> RAMEXC
 
-    .const      > ext_ddr
-    .bss        > ext_ddr
-    .far        > ext_ddr
+    .const      > DDR0
+    .bss        > DDR0
+    .far        > DDR0
 
-    .stack      > ext_ddr
-    .data       > ext_ddr
-    .cinit      > ext_ddr
-    .cio        > ext_ddr
+    .stack      > DDR0
+    .data       > DDR0
+    .cinit      > DDR0
+    .cio        > DDR0
 
-    .text       > ext_ddr
-    .sysmem     > ext_ddr
-    .switch     > ext_ddr
+    .text       > DDR0
+    .sysmem     > DDR0
+    .switch     > DDR0
 	
-	.irqStack 	> ext_ddr
-	.abortStack	> ext_ddr
+	.heap		> DDR0
+
+	.irqStack 	> DDR0
+	.abortStack	> DDR0
 }

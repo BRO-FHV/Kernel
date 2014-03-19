@@ -35,7 +35,7 @@ int main(void) {
 
 	reg32w(SOC_AINTC_REGS, INTC_MIR_CLEAR(68u >> REG_IDX_SHIFT), (0x01 << (68u & REG_BIT_MASK)));
 
-	TimerConfigure(Timer_TIMER2, 1, 1, IrqMode_MATCH, (1 << 18), 0x00, 0, 0,0, IrqWakeen_MAT_WUP_ENA);
+	TimerBasicConfiguration(Timer_TIMER2, 1, 1, (1 << 18), 0x00, 0, 0,0);
 	TimerEnable(Timer_TIMER2);
 
 	_enable_interrupts();
