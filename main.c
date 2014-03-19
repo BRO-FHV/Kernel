@@ -190,8 +190,8 @@ int main(void) {
 	printf("config timer\n");
 
 	/* Disable the system interrupt in the corresponding MIR_CLEAR register */
-	IntSystemEnable((unsigned int)68);
-    SetInterrupt(68,IRQHandle68);
+	IntHandlerEnable((unsigned int)68);
+    IntRegister(68,IRQHandle68);
 
 	//reg32m(INTC_MIR_CLEAR1, 0, (1 << 6));
 	reg32w(TIMER_2, TIMER_IRQENABLE_SET, 1);
@@ -226,9 +226,8 @@ interrupt void fiq_handler() {
  */
 #pragma INTERRUPT(irq_handler, IRQ)
 interrupt void irq_handler() {
-	unsigned int irq = reg32r(INTC_SIR_IRQ,0);
 	printf("irq interrupt\n");
-	HandleInterrupt(irq);
+	IntIRQHandler();
 }
 
 
