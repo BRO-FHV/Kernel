@@ -38,10 +38,13 @@ int main(void) {
 	GPIOModuleReset(SOC_GPIO_1_REGS);
 
 	GPIODirModeSet(SOC_GPIO_1_REGS,23,0);
+	GPIODirModeSet(SOC_GPIO_1_REGS,24,0);
+
+	GPIOPinWrite(SOC_GPIO_1_REGS,24,1);
 
 	volatile unsigned int enable = 1;
 	volatile unsigned int disable = 0;
-	volatile unsigned int wert = (1<<18);
+	volatile unsigned int wert = (1<<20);
 
 	TimerReset(Timer_TIMER2);
 	TimerBasicConfiguration(Timer_TIMER2, enable, enable, wert, disable, disable, disable, disable);
