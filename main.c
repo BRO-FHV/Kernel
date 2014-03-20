@@ -27,8 +27,6 @@ void IRQHandle68()
 }
 
 int main(void) {
-
-
 	CPUirqd();
 	printf("config timer\n");
 	IntControllerInit();
@@ -46,13 +44,11 @@ int main(void) {
 	volatile unsigned int disable = 0;
 	volatile unsigned int wert = (1<<20);
 
-	TimerBasicConfiguration(Timer_TIMER2, enable, enable, wert, disable, disable, disable, disable);
-	TimerInterruptConfiguration(Timer_TIMER2, IrqMode_MATCH, IrqWakeen_MAT_WUP_ENA, IRQHandle68);
+	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
 	TimerEnable(Timer_TIMER2);
 
 	CPUirqe();
 	printf("started - now wait!\n");
-
 	while (1) {
 		volatile int i = 0;
 
