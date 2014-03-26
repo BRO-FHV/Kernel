@@ -1,14 +1,26 @@
-////////////////////////////////////////////////////////
-// Linker command file for BeagleBone)				  //
-////////////////////////////////////////////////////////
-// Basic configuration using only external memory	  //
-////////////////////////////////////////////////////////
+/*
+ * Kernel: beagle.cmd
+ * Part of BRO Project, 2014 <<https://github.com/BRO-FHV>>
+ *
+ * Created on: 05.03.2014
+ * Description:
+ * Linker command file for BeagleBone
+ * Basic linker options
+ */
 
--stack           0x00002000
--heap            0x00F00000
+/* heap and stack sizes */
+-stack           0x00000008
+-heap            0x00002000
+
+/* supress warning _c_int00 entry point */
+--diag_suppress=10063
+
+/* set entry point to boot asm (boot.asm) func */
+-e boot
 
 MEMORY
 {
+<<<<<<< HEAD
 	SRAM:     o = 0x402F0400  l = 0x0000FC00  /* 64kB internal SRAM */
     L3OCMC0:  o = 0x40300000  l = 0x0000CE00  /* 64kB L3 OCMC SRAM */
     M3SHUMEM: o = 0x44D00000  l = 0x00004000  /* 16kB M3 Shared Unified Code Space */
@@ -25,29 +37,22 @@ MEMORY
 	//overriding the branch (load into PC) instruction between addresses from 0x4030CE04 to 0x4030CE1C
    	RAMEXC:   o = 0x4030CE04  l = 0x00000100  /* interrups exception mapping */
     DDR0:     o = 0x80000000  l = 0x7FFFFFF  /* external DDR Bank 0 */
+=======
+	RAMEXC:   o = 0x4030CE04  l = 0x00000100  	/* interrups exception mapping */
+    DDR0:     o = 0x80000000  l = 0x7FFFFFF		/* internal ram 128MB */
+>>>>>>> 3cfba02f327a7c05a188d671bb100412c5197385
 }
 
 SECTIONS
 {
-	// map interrupt-vectors to 0x40200000 instead of 0x4020FFC8 (OMAP35x.pdf at page 3438) because would not
-    // fit to memory (overshoot length). so in boot.asm the c12 register is set to 0x40200000
     .intvecs 	> RAMEXC
 
-    .const      > DDR0
-    .bss        > DDR0
-    .far        > DDR0
+    .text      	: load > DDR0
+    .data   	: load > DDR0
+    .bss    	: load > DDR0
+    .const 	    : load > DDR0
+    .stack  	: load > 0x87FFFFF0
 
-    .stack      > DDR0
-    .data       > DDR0
-    .cinit      > DDR0
-    .cio        > DDR0
-
-    .text       > DDR0
-    .sysmem     > DDR0
-    .switch     > DDR0
-
-	.heap		> DDR0
-
-	.irqStack 	> DDR0
-	.abortStack	> DDR0
+    .cinit	   	: load > DDR0
+    .sysmem		: load > DDR0
 }

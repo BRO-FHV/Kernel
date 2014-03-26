@@ -1,81 +1,91 @@
-	.armfunc _c_int00
-    .global _c_int00
-
-;****************************************************************************
-; Entry-Exit Point definition
-;****************************************************************************
+;
+; Kernel: boot.asm
+; Part of BRO Project, 2014 <<https://github.com/BRO-FHV>>
+;
+; Created on: Mar 26, 2014
+; Description:
+; boot function
+;
+; entry and exit point definition
+;
     .asg	_args_main,   ARGS_MAIN_RTN
     .asg	exit,         EXIT_RTN
     .asg    main_func_sp, MAIN_FUNC_SP
 
-;****************************************************************************
-;* DEFINES						                                            *
-;****************************************************************************
-	.global	__STACK_SIZE
+
+	.armfunc boot
+    .global boot
+
+    .ref __stack
+    .ref __STACK_END
+
+;
+; global definitions
+;
 	.global ARGS_MAIN_RTN
 	.global MAIN_FUNC_SP
 	.global	EXIT_RTN
 	.global __TI_auto_init
 
-	.global intvecs_adr
-	.global irqStack
-	.global abortStack
+;
+; define constants
+;
+_stackptr			.word	__STACK_END
+ABORT_STACK_SIZE 	.set    0x8
+IRQ_STACK_SIZE 		.set    0x1000
 
-intvecs_adr:.usect	".intvecs", 0, 4
-irqStack:.usect		".irqStack", 512, 4
-abortStack:.usect	".abortStack", 512, 4
+;
+; define arm mode masks
+;
+MODE_USR			.set	0x10
+MODE_FIQ			.set	0x11
+MODE_IRQ 			.set	0x12
+MODE_SVC			.set	0x13
+MODE_ABT 			.set	0x17
+MODE_UND			.set	0x1B
+MODE_SYS			.set	0x1F
 
+;
+; Entry point function
+;
+boot: .asmfunc
+	;
+	; adjust stack pointer
+	;
+	LDR		r0, _stackptr	; load address to stack pointer in r0
+	SUB		r0, r0, #8		; adjust sp
+	BIC		r0, r0, #7
 
-_intvecs_adr		.long	intvecs_adr
-_irqStack			.long	irqStack
-_abortStack			.long	abortStack
+	;
+	; switch to irq mode and set sp
+	;
+	CPS		#MODE_IRQ
+	MOV		sp, r0						; set sp
+	SUB		r0, r0, #IRQ_STACK_SIZE		; adjust sp
 
+	;
+	; switch to abort mode and set sp
+	;
+	CPS		#MODE_ABT
+	MOV     sp, r0						; set sp
+	SUB		r0, r0, #ABORT_STACK_SIZE	; adjust sp
 
-ABORT_STACK_SIZE 	.long    0x1000
-IRQ_STACK_SIZE 		.long    0x1000
+	;
+	; switch to sys mode
+	;
+	CPS		#MODE_SYS
+	MOV		sp, r0		; set sp
 
-;***************************************************************
-;* FUNCTION DEF: _c_int00                                      
-;***************************************************************
-_c_int00: .asmfunc
-        ;*------------------------------------------------------
-        ;* Switch to IRQ Mode and store stack-pointer
-        ;*------------------------------------------------------<
-        CPS		#0x12
-        LDR     sp, _irqStack
-		LDR		r0, IRQ_STACK_SIZE
-		ADD		sp, sp, r0
-        ;*------------------------------------------------------
-        ;* Switch to Abort Mode and store stack-pointer
-        ;*------------------------------------------------------
-        CPS		#0x17
-        LDR     sp, _abortStack
-		LDR		r0, ABORT_STACK_SIZE
-		ADD		sp, sp, r0
+	;
+	; Perform all the required initilizations:
+	;	* Process BINIT Table
+	;   * Perform C auto initialization
+	;   * Call global constructors
+	;
+	BL		__TI_auto_init
 
-        ;*------------------------------------------------------
-        ;* Set interrupt vector base address register out of user space
-        ;*------------------------------------------------------
-		LDR 	r0, _intvecs_adr
-		MCR		p15, #0, r0, c12, c0, #0
-
-        ;*------------------------------------------------------
-	    ; Enable Interrupts
-	    ;*------------------------------------------------------
-	    ; MRS   R12, CPSR
-	    ; BIC   R12, R12, #192
-	    ; MSR   CPSR_cf, R12
-
-		;*------------------------------------------------------
-        ;* Perform all the required initilizations:
-        ;*   - Process BINIT Table
-        ;*   - Perform C auto initialization
-        ;*   - Call global constructors
-        ;*------------------------------------------------------
-        BL      __TI_auto_init
-
-        ;*------------------------------------------------------
-        ;* CALL APPLICATION
-        ;*------------------------------------------------------
-        BL      ARGS_MAIN_RTN
+	;
+	; call application
+	;
+	BL      ARGS_MAIN_RTN
 .end
