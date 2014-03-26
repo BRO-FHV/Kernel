@@ -24,7 +24,7 @@ MEMORY
 	// Interrupt FIQ			0x4030CE1C
 	//overriding the branch (load into PC) instruction between addresses from 0x4030CE04 to 0x4030CE1C
    	RAMEXC:   o = 0x4030CE04  l = 0x00000100  /* interrups exception mapping */
-    DDR0:     o = 0x80000000  l = 0x40000000  /* 1GB external DDR Bank 0 */
+    DDR0:     o = 0x80000000  l = 0x7FFFFFF  /* external DDR Bank 0 */
 }
 
 SECTIONS

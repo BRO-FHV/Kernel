@@ -4,50 +4,52 @@
  *
  * Created on: 05.03.2014
  * Description:
- * TODO
+ * Main entry point of the OS. Important initializing is done.
  */
 
 #include <stdio.h>
 #include <stdint.h>
-//#include <hw_cm_per.h>
-//#include <soc_AM335x.h>
 #include "kernel.h"
 #include <interrupt/dr_interrupt.h>
 #include <timer/dr_timer.h>
-#include <gpio/dr_gpio.h>
+#include <led/dr_led.h>
 #include <soc_AM335x.h>
-#include <hw_cpu.h>
+#include <cpu/hw_cpu.h>
 
 
 void IRQHandle68()
 {
 	int i = GPIOPinRead(SOC_GPIO_1_REGS,23);
-	i = i == 0 ? 1:0;
-	GPIOPinWrite(SOC_GPIO_1_REGS,23,i);
+	if(i==0)
+	{
+		LedOn3();
+	}
+	else
+	{
+		LedOff3();
+	}
+
 }
 
 int main(void) {
+
 	CPUirqd();
+
 	printf("config timer\n");
+
 	IntControllerInit();
 
-	GPIO1ModuleClkConfig();
-	GPIOModuleEnable(SOC_GPIO_1_REGS);
-	GPIOModuleReset(SOC_GPIO_1_REGS);
+	LedInitRegister();
+	LedInit2();
+	LedInit3();
 
-	GPIODirModeSet(SOC_GPIO_1_REGS,23,0);
-	GPIODirModeSet(SOC_GPIO_1_REGS,24,0);
-
-	GPIOPinWrite(SOC_GPIO_1_REGS,24,1);
-
-	volatile unsigned int enable = 1;
-	volatile unsigned int disable = 0;
-	volatile unsigned int wert = (1<<20);
+	LedOn3();
 
 	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
 	TimerEnable(Timer_TIMER2);
 
 	CPUirqe();
+
 	printf("started - now wait!\n");
 	while (1) {
 		volatile int i = 0;
