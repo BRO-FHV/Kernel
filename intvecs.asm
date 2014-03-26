@@ -1,18 +1,28 @@
-;****************************************************************************
-; Setup interrupt vectors - Example 6-7 (ARM Optimizing C/C++ Compiler User's Guide p.136)
-;****************************************************************************
-	.global _c_int00
+;
+; Kernel: intvecs.asm
+; Part of BRO Project, 2014 <<https://github.com/BRO-FHV>>
+;
+; Created on: Mar 26, 2014
+; Description:
+; link int vectors
+;
+;
+; definition for interrupt handlers
+;
+	.global boot
 	.global udef_handler
-	.global swi_handler
+	.global swi_handler		; implemented in assembler file Driver/interrupt.asm
 	.global pabt_handler
 	.global dabt_handler
-	.global irq_handler
+	.global irq_handler		; implemented in assembler file Driver/interrupt.asm
 	.global fiq_handler
-;****************************************************************************
-; See AM335x Technical Reference Manual.pdf Page 4663 Table 23-10. RAM Exception Vectors
-;****************************************************************************
+
+;
+; define .intvecs memory section
+;	* see AM335x Technical Reference Manual.pdf Page 4663 Table 23-10 RAM Exception Vectors
+;
 	.sect ".intvecs"
-		;B _c_int00		; Reset
+		;B boot			; Reset
 		B udef_handler	; Interrupt Undefined		0x4030CE04
 		B swi_handler	; Interrupt SWI				0x4030CE08
 		B pabt_handler	; Interrupt Prefetch Abort	0x4030CE0C
