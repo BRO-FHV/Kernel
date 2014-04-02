@@ -17,9 +17,48 @@
 #include <cpu/hw_cpu.h>
 
 
-void IRQHandle68()
+void Timer1()
 {
-	int i = GPIOPinRead(SOC_GPIO_1_REGS,23);
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED0_PIN);
+	if(i==0)
+	{
+		LedOn0();
+	}
+	else
+	{
+		LedOff0();
+	}
+}
+
+void Timer2()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED1_PIN);
+	if(i==0)
+	{
+		LedOn1();
+	}
+	else
+	{
+		LedOff1();
+	}
+}
+
+void Timer3()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
+	if(i==0)
+	{
+		LedOn2();
+	}
+	else
+	{
+		LedOff2();
+	}
+}
+
+void Timer4()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
 	if(i==0)
 	{
 		LedOn3();
@@ -28,7 +67,6 @@ void IRQHandle68()
 	{
 		LedOff3();
 	}
-
 }
 
 int main(void) {
@@ -40,17 +78,23 @@ int main(void) {
 	IntControllerInit();
 
 	LedInitRegister();
+	LedInit0();
+	LedInit1();
 	LedInit2();
 	LedInit3();
 
-	LedOn3();
+	TimerConfiguration(Timer_TIMER1MS, 1000, Timer1);
+	TimerConfiguration(Timer_TIMER2, 2000, Timer2);
+	TimerConfiguration(Timer_TIMER3, 3000, Timer3);
+	TimerConfiguration(Timer_TIMER4, 4000, Timer4);
 
-	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
+	TimerEnable(Timer_TIMER1MS);
 	TimerEnable(Timer_TIMER2);
+	TimerEnable(Timer_TIMER3);
+	TimerEnable(Timer_TIMER4);
 
 	CPUirqe();
 
-	printf("started - now wait!\n");
 	while (1) {
 		volatile int i = 0;
 
