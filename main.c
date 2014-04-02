@@ -73,8 +73,6 @@ int main(void) {
 
 	CPUirqd();
 
-	printf("config timer\n");
-
 	IntControllerInit();
 
 	LedInitRegister();
@@ -83,15 +81,17 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER1MS, 1000, Timer1);
-	TimerConfiguration(Timer_TIMER2, 2000, Timer2);
-	TimerConfiguration(Timer_TIMER3, 3000, Timer3);
-	TimerConfiguration(Timer_TIMER4, 4000, Timer4);
+	//TimerConfiguration(Timer_TIMER1MS, 0, Timer1);
+	TimerConfiguration(Timer_TIMER2, 4000, Timer2);
+	TimerConfiguration(Timer_TIMER3, 2000, Timer3);
+	TimerConfiguration(Timer_TIMER4, 6000, Timer4);
+	TimerConfiguration(Timer_TIMER5, 8000, Timer1);
 
-	TimerEnable(Timer_TIMER1MS);
+	//TimerEnable(Timer_TIMER1MS);
 	TimerEnable(Timer_TIMER2);
 	TimerEnable(Timer_TIMER3);
 	TimerEnable(Timer_TIMER4);
+	TimerEnable(Timer_TIMER5);
 
 	CPUirqe();
 
