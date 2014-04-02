@@ -19,7 +19,7 @@
 
 void IRQHandle68()
 {
-	int i = GPIOPinRead(SOC_GPIO_1_REGS,23);
+	int i = GPIOPinRead(SOC_GPIO_1_REGS,24);
 	if(i==0)
 	{
 		LedOn3();
