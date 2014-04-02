@@ -10,15 +10,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "kernel.h"
-#include <dr_gpio.h>
-#include <soc_AM335x.h>
+#include <led/dr_led.h>
 
 
 /*****************************************************************************
 **                INTERNAL MACRO DEFINITIONS
 *****************************************************************************/
-#define GPIO_INSTANCE_ADDRESS           (SOC_GPIO_1_REGS)
-#define GPIO_INSTANCE_PIN_NUMBER        (23)
+
 
 
 /*****************************************************************************
@@ -29,41 +27,33 @@ static void Delay(unsigned int count);
 
 int main(void) {
 
-	GPIO0ModuleClkConfig();
-	GPIO1ModuleClkConfig();
-	GPIO3ModuleClkConfig();
-
-	// GPIO1Pin23PinMuxSetup();
-
-	/* Enabling the GPIO module. */
-	GPIOModuleEnable(GPIO_INSTANCE_ADDRESS);
-
-	/* Resetting the GPIO module. */
-	GPIOModuleReset(GPIO_INSTANCE_ADDRESS);
-
-	/* Setting the GPIO pin as an output pin. */
-	GPIODirModeSet(GPIO_INSTANCE_ADDRESS,
-	               GPIO_INSTANCE_PIN_NUMBER,
-	               GPIO_DIR_OUTPUT);
+	InitLedRegister();
+	InitLed0();
+	InitLed1();
+	InitLed2();
+	InitLed3();
 
 	  while(1)
 	    {
 	        /* Driving a logic HIGH on the GPIO pin. */
-	        GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
-	                     GPIO_INSTANCE_PIN_NUMBER,
-	                     GPIO_PIN_HIGH);
+
+		  	OnLed0();
+	        OnLed1();
+	        OnLed2();
+	        OnLed3();
 
 	        Delay(0x3FFFF);
 
 	        /* Driving a logic LOW on the GPIO pin. */
-	        GPIOPinWrite(GPIO_INSTANCE_ADDRESS,
-	                     GPIO_INSTANCE_PIN_NUMBER,
-	                     GPIO_PIN_LOW);
+	        OffLed0();
+	        OffLed1();
+	        OffLed2();
+	        OffLed3();
 
 	        Delay(0x3FFFF);
 	    }
 
-	  int i=0;
+
 
 }
 
