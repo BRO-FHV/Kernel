@@ -15,20 +15,30 @@
 #include <led/dr_led.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
+#include <scheduler.h>
 
+extern irq_handler(void);
 
-void IRQHandle68()
-{
-	int i = GPIOPinRead(SOC_GPIO_1_REGS,24);
-	if(i==0)
-	{
-		LedOn3();
+void IRQHandle68() {
+	//scheduler_runNextProcess(context);
+	printf("asdf");
+}
+
+void switchLEDON() {
+	while (1) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, 24);
+		if (i == 0) {
+			LedOn3();
+		}
 	}
-	else
-	{
-		LedOff3();
+}
+void switchLEDOFF() {
+	while (1) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, 24);
+		if (i > 0) {
+			LedOff3();
+		}
 	}
-
 }
 
 int main(void) {
@@ -43,12 +53,14 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	LedOn3();
-
-	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
+	TimerConfiguration(Timer_TIMER2, 100000, scheduler_runNextProcess);
 	TimerEnable(Timer_TIMER2);
 
+	scheduler_startProcess(&switchLEDON);
+	scheduler_startProcess(&switchLEDOFF);
+
 	CPUirqe();
+
 
 	printf("started - now wait!\n");
 	while (1) {
@@ -62,24 +74,6 @@ int main(void) {
 #pragma INTERRUPT(fiq_handler, FIQ)
 interrupt void fiq_handler() {
 	printf("fiq interrupt\n");
-}
-
-/**
- * Is called on any interrupt request.
- */
-#pragma INTERRUPT(irq_handler, IRQ)
-interrupt void irq_handler() {
-	printf("irq interrupt\n");
-	IntIRQHandler();
-}
-
-
-/**
- * Is called on any sw interrupt request.
- */
-#pragma INTERRUPT(swi_handler, IRQ)
-interrupt void swi_handler() {
-	printf("swi interrupt\n");
 }
 
 /**
