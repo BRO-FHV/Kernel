@@ -24,18 +24,35 @@ void IRQHandle68() {
 	printf("asdf");
 }
 
-void switchLEDON() {
+void switchLED2ON() {
 	while (1) {
-		int i = GPIOPinRead(SOC_GPIO_1_REGS, 24);
-		if (i == 0) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
+		if (!(i & (1 << LED2_PIN))) {
+			LedOn2();
+		}
+	}
+}
+void switchLED2OFF() {
+	while (1) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
+		if (i & (1 << LED2_PIN)) {
+			LedOff2();
+		}
+	}
+}
+
+void switchLED3ON() {
+	while (1) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
+		if (!(i & (1 << 23))) {
 			LedOn3();
 		}
 	}
 }
-void switchLEDOFF() {
+void switchLED3OFF() {
 	while (1) {
-		int i = GPIOPinRead(SOC_GPIO_1_REGS, 24);
-		if (i > 0) {
+		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
+		if (i & (1 << 23)) {
 			LedOff3();
 		}
 	}
@@ -53,14 +70,15 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 100000, scheduler_runNextProcess);
+	TimerConfiguration(Timer_TIMER2, 2000, scheduler_runNextProcess);
 	TimerEnable(Timer_TIMER2);
 
-	scheduler_startProcess(&switchLEDON);
-	scheduler_startProcess(&switchLEDOFF);
+	scheduler_startProcess(&switchLED2ON);
+	scheduler_startProcess(&switchLED2OFF);
+	scheduler_startProcess(&switchLED3ON);
+	scheduler_startProcess(&switchLED3OFF);
 
 	CPUirqe();
-
 
 	printf("started - now wait!\n");
 	while (1) {
