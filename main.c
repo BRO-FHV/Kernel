@@ -38,16 +38,16 @@ int main(void) {
 	        /* Driving a logic HIGH on the GPIO pin. */
 
 		  	OnLed0();
-	        OnLed1();
-	        OnLed2();
+	        OffLed1();
+	        OffLed2();
 	        OnLed3();
 
 	        Delay(0x3FFFF);
 
 	        /* Driving a logic LOW on the GPIO pin. */
 	        OffLed0();
-	        OffLed1();
-	        OffLed2();
+	        OnLed1();
+	        OnLed2();
 	        OffLed3();
 
 	        Delay(0x3FFFF);
