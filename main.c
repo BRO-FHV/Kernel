@@ -27,7 +27,7 @@ void IRQHandle68() {
 void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
-		if (!(i & (1 << LED2_PIN))) {
+		if (i==0) {
 			LedOn2();
 		}
 	}
@@ -35,7 +35,7 @@ void switchLED2ON() {
 void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
-		if (i & (1 << LED2_PIN)) {
+		if (i==1) {
 			LedOff2();
 		}
 	}
@@ -44,7 +44,7 @@ void switchLED2OFF() {
 void switchLED3ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
-		if (!(i & (1 << 23))) {
+		if (i==0) {
 			LedOn3();
 		}
 	}
@@ -52,7 +52,7 @@ void switchLED3ON() {
 void switchLED3OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
-		if (i & (1 << 23)) {
+		if (i==1) {
 			LedOff3();
 		}
 	}
