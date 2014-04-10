@@ -35,7 +35,7 @@ void switchLED2ON() {
 void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
-		if (i==1) {
+		if (i!=0) {
 			LedOff2();
 		}
 	}
@@ -52,7 +52,7 @@ void switchLED3ON() {
 void switchLED3OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
-		if (i==1) {
+		if (i!=0) {
 			LedOff3();
 		}
 	}
