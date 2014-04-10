@@ -11,42 +11,19 @@
 #include <stdint.h>
 #include "kernel.h"
 #include <interrupt/dr_interrupt.h>
-#include <timer/dr_timer.h>
-#include <led/dr_led.h>
+#include <eth/dr_eth.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 
-
-void IRQHandle68()
-{
-	int i = GPIOPinRead(SOC_GPIO_1_REGS,24);
-	if(i==0)
-	{
-		LedOn3();
-	}
-	else
-	{
-		LedOff3();
-	}
-
-}
 
 int main(void) {
 
 	CPUirqd();
 
-	printf("config timer\n");
-
 	IntControllerInit();
 
-	LedInitRegister();
-	LedInit2();
-	LedInit3();
-
-	LedOn3();
-
-	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
-	TimerEnable(Timer_TIMER2);
+	//IMPORTANT: configure ethernet after interrupt init!
+	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
 	CPUirqe();
 
