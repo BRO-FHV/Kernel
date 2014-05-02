@@ -16,8 +16,46 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <scheduler.h>
+#include <mmu/mmu.h>
+
+/****************************************************************************/
+/*                      INTERNAL MACRO DEFINITIONS                          */
+/****************************************************************************/
+#define UART_THR_RHR_REG           (SOC_UART_0_REGS)
+
+#define MAX_ACNT                   (1u)
+#define MAX_CCNT                   (1u)
+
+#define TX_BUFFER_SIZE             (26u)
+
+/* EDMA3 Event queue number. */
+#define EVT_QUEUE_NUM              (0u)
+
+/* PaRAM Set number for Dummy Transfer. */
+#define DUMMY_CH_NUM               (5u)
+
+/* UART Module Input Frequency. */
+#define UART_MODULE_INPUT_CLK      (48000000u)
+
+/* Baud Rate of UART for communication. */
+#define BAUD_RATE_115200           (115200u)
+
+#define TX_THRESHOLD               (1)
+#define RX_THRESHOLD               (1)
+#define START_ADDR_DDR             (0x80000000)
+#define START_ADDR_DEV             (0x44000000)
+#define START_ADDR_OCMC            (0x40300000)
+#define NUM_SECTIONS_DDR           (512)
+#define NUM_SECTIONS_DEV           (960)
+#define NUM_SECTIONS_OCMC          (1)
+
+#pragma DATA_ALIGN(pageTable, 16384);
+static volatile unsigned int pageTable[4*1024];
 
 extern irq_handler(void);
+
+
+
 
 void IRQHandle68() {
 	//scheduler_runNextProcess(context);
@@ -58,9 +96,18 @@ void switchLED3OFF() {
 	}
 }
 
+
+
+
+
+
 int main(void) {
 
+
 	CPUirqd();
+
+
+	mmu_init();
 
 	printf("config timer\n");
 
@@ -80,7 +127,7 @@ int main(void) {
 
 	CPUirqe();
 
-	printf("started - now wait!\n");
+	/*printf("started - now wait!\n");*/
 	while (1) {
 		volatile int i = 0;
 
@@ -116,4 +163,5 @@ interrupt void pabt_handler() {
 #pragma INTERRUPT(dabt_handler, DABT)
 interrupt void dabt_handler() {
 	printf("dabt interrupt\n");
+	mmu_handle_data_abort();
 }

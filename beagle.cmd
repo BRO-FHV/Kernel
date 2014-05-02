@@ -10,7 +10,7 @@
 
 /* heap and stack sizes */
 -stack           0x00000008
--heap            0x00002000
+-heap            0x00080000
 
 /* supress warning _c_int00 entry point */
 --diag_suppress=10063
