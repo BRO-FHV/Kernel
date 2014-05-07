@@ -16,7 +16,7 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <scheduler.h>
-#include <mmu/mmu.h>
+#include <mmu/sc_mmu.h>
 
 /****************************************************************************/
 /*                      INTERNAL MACRO DEFINITIONS                          */
