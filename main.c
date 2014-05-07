@@ -14,6 +14,7 @@
 #include <eth/dr_eth.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
+#include <eth/echo/dr_echo.h>
 
 
 int main(void) {
@@ -24,8 +25,12 @@ int main(void) {
 
 	//IMPORTANT: configure ethernet after interrupt init!
 	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
+//	EthConfigureWithDHCP();
 
 	CPUirqe();
+
+    /* Initialize the sample httpd server. */
+    echo_init();
 
 	printf("started - now wait!\n");
 	while (1) {

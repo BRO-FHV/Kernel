@@ -7,12 +7,38 @@
  * TODO
  */
 
-#ifndef LWIPOPTS_H_
-#define LWIPOPTS_H_
+#ifndef __LWIPOPTS_H__
+#define __LWIPOPTS_H__
 
 /*****************************************************************************
 **                           CONFIGURATIONS
 *****************************************************************************/
+/*
+** If Static IP address to be used, give it here. This value shall be 0 if
+** dynamic IP address is to be used.
+** For Example, for IP Address 192.168.247.1, use the corresponding hex
+** value 0xC0A8F701.
+*/
+#define STATIC_IP_ADDRESS_PORT1         0
+#define STATIC_IP_ADDRESS_PORT2         0
+
+/*
+** The macro CPSW_DUAL_MAC_MODE shall be defined for using CPSW ports in
+** Dual MAC mode.
+*/
+#define CPSW_DUAL_MAC_MODE
+
+/*
+** The below macro should be defined for using lwIP with cache. For cache
+** enabling, pbuf pool shall be cache line aligned. This is done by using
+** separate pool for each memory. The alignment of pbuf pool to cache line
+** size is done in /ports/cpsw/include/arch/cc.h.
+*/
+//TODO Stefan: enable if can be MMU configured
+//#define LWIP_CACHE_ENABLED
+
+#define SOC_CACHELINE_SIZE_BYTES        64            /* Number of bytes in
+                                                         a cache line */
 /*
 ** The timeout for DHCP completion. lwIP library will wait for DHCP
 ** completion for (LWIP_DHCP_TIMEOUT / 100) seconds.
@@ -102,4 +128,4 @@
 #define LWIP_DBG_TYPES_ON               (LWIP_DBG_ON | LWIP_DBG_TRACE \
                                          |LWIP_DBG_STATE | LWIP_DBG_FRESH)
 
-#endif /* LWIPOPTS_H_ */
+#endif /* __LWIPOPTS_H__ */
