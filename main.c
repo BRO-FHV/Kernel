@@ -50,12 +50,9 @@
 #define NUM_SECTIONS_OCMC          (1)
 
 #pragma DATA_ALIGN(pageTable, 16384);
-static volatile unsigned int pageTable[4*1024];
+static volatile unsigned int pageTable[4 * 1024];
 
 extern irq_handler(void);
-
-
-
 
 void IRQHandle68() {
 	//scheduler_runNextProcess(context);
@@ -65,7 +62,7 @@ void IRQHandle68() {
 void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
-		if (i==0) {
+		if (i == 0) {
 			LedOn2();
 		}
 	}
@@ -73,7 +70,7 @@ void switchLED2ON() {
 void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
-		if (i!=0) {
+		if (i != 0) {
 			LedOff2();
 		}
 	}
@@ -82,7 +79,7 @@ void switchLED2OFF() {
 void switchLED3ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
-		if (i==0) {
+		if (i == 0) {
 			LedOn3();
 		}
 	}
@@ -90,22 +87,15 @@ void switchLED3ON() {
 void switchLED3OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
-		if (i!=0) {
+		if (i != 0) {
 			LedOff3();
 		}
 	}
 }
 
-
-
-
-
-
 int main(void) {
 
-
 	CPUirqd();
-
 
 	mmu_init();
 
@@ -117,7 +107,7 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 2000, scheduler_runNextProcess);
+	TimerConfiguration(Timer_TIMER2, 20000, scheduler_runNextProcess);
 	TimerEnable(Timer_TIMER2);
 
 	scheduler_startProcess(&switchLED2ON);
@@ -155,6 +145,7 @@ interrupt void udef_handler() {
 #pragma INTERRUPT(pabt_handler, PABT)
 interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
+	// TODO kill process next process
 }
 
 /**
@@ -162,6 +153,6 @@ interrupt void pabt_handler() {
  */
 #pragma INTERRUPT(dabt_handler, DABT)
 interrupt void dabt_handler() {
-	printf("dabt interrupt\n");
-	mmu_handle_data_abort();
+	printf("pabt interrupt\n");
+	// TODO page fault return to process
 }
