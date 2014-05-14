@@ -17,19 +17,9 @@
 #include <cpu/hw_cpu.h>
 #include <sd/dr_sd.h>
 
-void IRQHandle68()
-{
-	int i = GPIOPinRead(SOC_GPIO_1_REGS,24);
-	if(i==0)
-	{
-		LedOn3();
-	}
-	else
-	{
-		LedOff3();
-	}
 
-}
+extern irq_handler(void);
+
 
 int main(void) {
 
@@ -52,24 +42,6 @@ int main(void) {
 #pragma INTERRUPT(fiq_handler, FIQ)
 interrupt void fiq_handler() {
 	printf("fiq interrupt\n");
-}
-
-/**
- * Is called on any interrupt request.
- */
-#pragma INTERRUPT(irq_handler, IRQ)
-interrupt void irq_handler() {
-	printf("irq interrupt\n");
-	IntIRQHandler();
-}
-
-
-/**
- * Is called on any sw interrupt request.
- */
-#pragma INTERRUPT(swi_handler, IRQ)
-interrupt void swi_handler() {
-	printf("swi interrupt\n");
 }
 
 /**
