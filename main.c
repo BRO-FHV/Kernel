@@ -15,7 +15,7 @@
 #include <led/dr_led.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
-
+#include <sd/dr_sd.h>
 
 void IRQHandle68()
 {
@@ -35,18 +35,8 @@ int main(void) {
 
 	CPUirqd();
 
-	printf("config timer\n");
+	startFileSystem();
 
-	IntControllerInit();
-
-	LedInitRegister();
-	LedInit2();
-	LedInit3();
-
-	LedOn3();
-
-	TimerConfiguration(Timer_TIMER2, 1000, IRQHandle68);
-	TimerEnable(Timer_TIMER2);
 
 	CPUirqe();
 
