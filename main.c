@@ -25,10 +25,9 @@ int main(void) {
 
 	CPUirqd();
 
+    IntControllerInit();
 	startFileSystem();
 
-
-	CPUirqe();
 
 	printf("started - now wait!\n");
 	while (1) {
