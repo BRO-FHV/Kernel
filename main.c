@@ -153,6 +153,6 @@ interrupt void pabt_handler() {
  */
 #pragma INTERRUPT(dabt_handler, DABT)
 interrupt void dabt_handler() {
-	printf("pabt interrupt\n");
+	printf("dabt interrupt\n");
 	// TODO page fault return to process
 }
