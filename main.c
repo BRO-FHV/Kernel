@@ -15,6 +15,7 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <eth/echo/dr_echo.h>
+#include <eth/broadcast/dr_broadcast.h>
 
 
 int main(void) {
@@ -30,7 +31,8 @@ int main(void) {
 	CPUirqe();
 
     /* Initialize the sample httpd server. */
-    echo_init();
+    //echo_init();
+	broadcast_start();
 
 	printf("started - now wait!\n");
 	while (1) {
