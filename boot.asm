@@ -80,7 +80,7 @@ boot: .asmfunc
 	; Perform all the required initilizations:
 	;	* Process BINIT Table
 	;   * Perform C auto initialization
-	;   * Call global constructors
+	;   *	 Call global constructors
 	;
 	BL		__TI_auto_init
 

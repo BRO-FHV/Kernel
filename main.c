@@ -17,24 +17,25 @@
 #include <eth/echo/dr_echo.h>
 #include <eth/broadcast/dr_broadcast.h>
 
+extern irq_handler(void);
 
 int main(void) {
 
 	CPUirqd();
-
 	IntControllerInit();
+	CPUirqe();
 
-	//IMPORTANT: configure ethernet after interrupt init!
+
+
 	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 //	EthConfigureWithDHCP();
 
-	CPUirqe();
+    printf("starting echo server...\n");
+	EchoStart();
 
-    /* Initialize the sample httpd server. */
-    //echo_init();
-	broadcast_start();
+	printf("starting broadcast service... \n");
+	BroadcastStart();
 
-	printf("started - now wait!\n");
 	while (1) {
 		volatile int i = 0;
 
@@ -46,24 +47,6 @@ int main(void) {
 #pragma INTERRUPT(fiq_handler, FIQ)
 interrupt void fiq_handler() {
 	printf("fiq interrupt\n");
-}
-
-/**
- * Is called on any interrupt request.
- */
-#pragma INTERRUPT(irq_handler, IRQ)
-interrupt void irq_handler() {
-	printf("irq interrupt\n");
-	IntIRQHandler();
-}
-
-
-/**
- * Is called on any sw interrupt request.
- */
-#pragma INTERRUPT(swi_handler, IRQ)
-interrupt void swi_handler() {
-	printf("swi interrupt\n");
 }
 
 /**
