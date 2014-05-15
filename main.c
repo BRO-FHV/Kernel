@@ -9,7 +9,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "kernel.h"
 #include <interrupt/dr_interrupt.h>
 #include <eth/dr_eth.h>
 #include <soc_AM335x.h>
@@ -20,12 +19,9 @@
 extern irq_handler(void);
 
 int main(void) {
-
 	CPUirqd();
 	IntControllerInit();
 	CPUirqe();
-
-
 
 	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 //	EthConfigureWithDHCP();
