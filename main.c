@@ -86,10 +86,10 @@ int main(void) {
 	LedInit3();
 
 	//TimerConfiguration(Timer_TIMER1MS, 0, Timer1); //ms not needed
-	TimerConfiguration(Timer_TIMER2, 2000, Timer1);
-	TimerConfiguration(Timer_TIMER3, 4000, Timer2);
-	TimerConfiguration(Timer_TIMER4, 6000, Timer3);
-	TimerConfiguration(Timer_TIMER5, 8000, Timer4);
+	TimerConfiguration(Timer_TIMER2, 1000, Timer1);
+	TimerConfiguration(Timer_TIMER3, 2000, Timer2);
+	TimerConfiguration(Timer_TIMER4, 3000, Timer3);
+	TimerConfiguration(Timer_TIMER5, 4000, Timer4);
 
 	//further possible timers - THEY WORK!
 	//TimerConfiguration(Timer_TIMER6, 10000, Timer1);
