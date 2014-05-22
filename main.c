@@ -15,6 +15,10 @@
 #include <cpu/hw_cpu.h>
 #include <eth/echo/dr_echo.h>
 #include <eth/broadcast/dr_broadcast.h>
+#include <timer/dr_timer.h>
+#include <led/dr_led.h>
+#include <soc_AM335x.h>
+#include <cpu/hw_cpu.h>
 
 extern irq_handler(void);
 
@@ -23,8 +27,8 @@ int main(void) {
 	IntControllerInit();
 	CPUirqe();
 
-	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
-//	EthConfigureWithDHCP();
+//	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
+	EthConfigureWithDHCP();
 
     printf("starting echo server...\n");
 	EchoStart();
@@ -32,10 +36,18 @@ int main(void) {
 	printf("starting broadcast service... \n");
 	BroadcastStart();
 
-	while (1) {
-		volatile int i = 0;
+	TimerDelaySetup();
+	LedInitRegister();
+	LedInit0();
 
-		for (i = 0; i < 1000000; i++) {
+	while (1) {
+		TimerDelayDelay(500);
+
+		int ledStatus = GPIOPinRead(SOC_GPIO_1_REGS, LED0_PIN);
+		if (ledStatus) {
+			LedOff0();
+		} else {
+			LedOn0();
 		}
 	}
 }
