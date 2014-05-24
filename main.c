@@ -54,11 +54,6 @@ static volatile unsigned int pageTable[4 * 1024];
 
 extern irq_handler(void);
 
-void IRQHandle68() {
-	//scheduler_runNextProcess(context);
-	printf("asdf");
-}
-
 void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
@@ -107,7 +102,7 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 20000, scheduler_runNextProcess);
+	TimerConfiguration(Timer_TIMER2, 1000, scheduler_runNextProcess);
 	TimerEnable(Timer_TIMER2);
 
 	scheduler_startProcess(&switchLED2ON);
@@ -124,4 +119,25 @@ int main(void) {
 		for (i = 0; i < 1000000; i++) {
 		}
 	}
+}
+
+/**
+ * Is called on any undefined error which caused an abort
+ */
+#pragma INTERRUPT(udef_handler, UDEF)
+interrupt void udef_handler() {
+	printf("udef interrupt\n");
+}
+
+#pragma INTERRUPT(fiq_handler, FIQ)
+interrupt void fiq_handler() {
+	printf("fiq interrupt\n");
+}
+
+/**
+ * Is called on any prefetch abort.
+ */
+#pragma INTERRUPT(pabt_handler, PABT)
+interrupt void pabt_handler() {
+	printf("pabt interrupt\n");
 }
