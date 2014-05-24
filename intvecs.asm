@@ -21,7 +21,7 @@
 ; define .intvecs memory section
 ;	* see AM335x Technical Reference Manual.pdf Page 4663 Table 23-10 RAM Exception Vectors
 ;
-	.sect ".intvecs"
+	.sect ".interrupts"
 		;B boot			; Reset
 		B udef_handler	; Interrupt Undefined		0x4030CE04
 		B swi_handler	; Interrupt SWI				0x4030CE08

@@ -45,7 +45,7 @@ c_sp_kernel		.long	kernelStack
 c_sp_abort		.long	abortStack
 c_sp_system		.long	systemStack
 
-_int_vecs		.long 	int_vecs
+;_int_vecs		.long 	int_vecs
 
 ;
 ; define arm mode masks
@@ -87,8 +87,8 @@ boot: .asmfunc
 	LDR		sp, c_sp_system
 
 	; Interrupt Vectors base register
-	LDR R0, _int_vecs
-	MCR p15, #0, R0, c12, c0, #0
+	;LDR R0, _int_vecs
+	;MCR p15, #0, R0, c12, c0, #0
 
 	;
 	; Perform all the required initilizations:
