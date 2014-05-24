@@ -52,8 +52,6 @@
 #pragma DATA_ALIGN(pageTable, 16384);
 static volatile unsigned int pageTable[4 * 1024];
 
-extern irq_handler(void);
-
 void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
