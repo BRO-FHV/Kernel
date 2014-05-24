@@ -59,8 +59,8 @@ void switchLED2ON() {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i == 0) {
 			uint32_t* x = (uint32_t*) 0x81200000;
-			x[0] = 10;
-			printf("x: %p, *x: %d, i: %d\n", x, x[0], i);
+			*x = 5;
+			printf("x: %p, *x: %d, i: %d\n", x, *x, i);
 			LedOn2();
 		}
 	}
@@ -70,8 +70,8 @@ void switchLED2OFF() {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i != 0) {
 			uint32_t* x = (uint32_t*) 0x81200000;
-			x[0] = 10;
-			printf("x: %p, *x: %d, i: %d\n", x, x[0], i);
+			*x = 10;
+			printf("x: %p, *x: %d, i: %d\n", x, *x, i);
 			LedOff2();
 		}
 	}
