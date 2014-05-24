@@ -8,7 +8,9 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include "kernel.h"
 #include <interrupt/dr_interrupt.h>
 #include <timer/dr_timer.h>
@@ -56,6 +58,9 @@ void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i == 0) {
+			uint32_t* x = (uint32_t*) 0x81200000;
+			x[0] = 10;
+			printf("x: %p, *x: %d, i: %d\n", x, x[0], i);
 			LedOn2();
 		}
 	}
@@ -64,6 +69,9 @@ void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i != 0) {
+			uint32_t* x = (uint32_t*) 0x81200000;
+			x[0] = 10;
+			printf("x: %p, *x: %d, i: %d\n", x, x[0], i);
 			LedOff2();
 		}
 	}
