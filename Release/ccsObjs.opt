@@ -1,0 +1,1 @@
+"./main.obj" "./intvecs.obj" "./boot.obj" "../AM3359.cmd" -l"libc.a" -l"C:\Users\GIGI\GitWorkspace\BRO-FHV\Hal\Debug\Hal.lib" -l"C:\Users\GIGI\GitWorkspace\BRO-FHV\Driver\Debug\Driver.lib" -l"C:\Users\GIGI\GitWorkspace\BRO-FHV\Scheduler\Debug\Scheduler.lib" 

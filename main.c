@@ -63,11 +63,3 @@ interrupt void udef_handler() {
 interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
 }
-
-/**
- * Is called on any data abort.
- */
-#pragma INTERRUPT(dabt_handler, DABT)
-interrupt void dabt_handler() {
-	printf("dabt interrupt\n");
-}

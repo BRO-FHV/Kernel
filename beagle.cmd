@@ -9,8 +9,8 @@
  */
 
 /* heap and stack sizes */
--stack           0x00000008
--heap            0x00002000
+-stack           0x00002000
+-heap            0x00F00000
 
 /* supress warning _c_int00 entry point */
 --diag_suppress=10063
@@ -20,20 +20,41 @@
 
 MEMORY
 {
-	RAMEXC:   o = 0x4030CE04  l = 0x00000100  	/* interrups exception mapping */
-    DDR0:     o = 0x80000000  l = 0x7FFFFFF		/* internal ram 128MB */
+    int_ram:    o = 0x40200000  l = 0x0000FF4C
+	int_vecs:   o = 0x4030CE04  l = 0x00000100  	/* interrups exception mapping */
+    ext_ddr:    o = 0x80000000  l = 0x7FFFFFF		/* internal ram 128MB */
 }
 
 SECTIONS
 {
-    .intvecs 	> RAMEXC
+	.intvecs   > int_vecs {
+		int_vecs = .;
+		*(.intvecs)
+	}
 
-    .text      	: load > DDR0
-    .data   	: load > DDR0
-    .bss    	: load > DDR0
-    .const 	    : load > DDR0
-    .stack  	: load > 0x87FFFFF0
+    .const      > ext_ddr
+    .bss        > ext_ddr
+    .far        > ext_ddr
 
-    .cinit	   	: load > DDR0
-    .sysmem		: load > DDR0
+    .stack      > ext_ddr
+    .data       > ext_ddr
+    .cinit      > ext_ddr
+    .cio        > ext_ddr
+
+    .text       > ext_ddr
+    .sysmem     > ext_ddr
+    .switch     > ext_ddr
+
+	.stackarea  > ext_ddr {
+		. = align(4);
+		. = . + (4 * 1024);
+		kernelStack = .;
+		. = . + (4 * 1024);
+		irqStack = .;
+		. = . + (4 * 1024);
+		systemStack = .;
+		. = . + (4 * 1024);
+		abortStack = .;
+		ext_ddr_user_start = .;
+	}
 }
