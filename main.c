@@ -27,10 +27,14 @@ int main(void) {
 
 	IntControllerInit();
 
+	//ALWAYS CONFIGURE DELAY TIMER FIRST!
+	//AND ENABLE INTERRUPTS AFTERWARDS
+	TimerDelaySetup();
+	CPUirqe();
+
 //	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 	EthConfigureWithDHCP();
 
-	CPUirqe();
 
 	printf("starting echo server...\n");
 	EchoStart();
