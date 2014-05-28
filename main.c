@@ -24,10 +24,11 @@ int main(void) {
 	MmuInit();
 
 	IntControllerInit();
-	CPUirqe();
 
 //	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 	EthConfigureWithDHCP();
+
+	CPUirqe();
 
 	printf("starting echo server...\n");
 	EchoStart();
