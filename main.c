@@ -15,18 +15,21 @@
 #include <cpu/hw_cpu.h>
 #include <eth/echo/dr_echo.h>
 #include <eth/broadcast/dr_broadcast.h>
+#include <mmu/sc_mmu.h>
 
 extern irq_handler(void);
 
 int main(void) {
 	CPUirqd();
+	MmuInit();
+
 	IntControllerInit();
 	CPUirqe();
 
-	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
-//	EthConfigureWithDHCP();
+//	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
+	EthConfigureWithDHCP();
 
-    printf("starting echo server...\n");
+	printf("starting echo server...\n");
 	EchoStart();
 
 	printf("starting broadcast service... \n");
