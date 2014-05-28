@@ -14,23 +14,24 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <eth/echo/dr_echo.h>
-#include <eth/broadcast/dr_broadcast.h>
 #include <timer/dr_timer.h>
 #include <led/dr_led.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
-
-extern irq_handler(void);
+#include <mmu/sc_mmu.h>
+#include <eth/broadcast/dr_broadcast.h>
 
 int main(void) {
 	CPUirqd();
+	MmuInit();
+
 	IntControllerInit();
 	CPUirqe();
 
 //	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 	EthConfigureWithDHCP();
 
-    printf("starting echo server...\n");
+	printf("starting echo server...\n");
 	EchoStart();
 
 	printf("starting broadcast service... \n");
@@ -71,12 +72,4 @@ interrupt void udef_handler() {
 #pragma INTERRUPT(pabt_handler, PABT)
 interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
-}
-
-/**
- * Is called on any data abort.
- */
-#pragma INTERRUPT(dabt_handler, DABT)
-interrupt void dabt_handler() {
-	printf("dabt interrupt\n");
 }
