@@ -16,20 +16,24 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <sd/dr_sd.h>
-
+#include <scheduler.h>
+#include "Test.h"
+#include <mmu/sc_mmu.h>
 
 extern irq_handler(void);
-
 
 int main(void) {
 
 	CPUirqd();
 
-    IntControllerInit();
-	startFileSystem();
+		MmuInit();
 
+		IntControllerInit();
 
 	printf("started - now wait!\n");
+	uint32_t l = sizeof(Test) / sizeof(Test[0]);
+	loadProcessFromElf(l, Test);
+	CPUirqe();
 	while (1) {
 		volatile int i = 0;
 
