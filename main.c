@@ -21,6 +21,20 @@
 #include <mmu/sc_mmu.h>
 #include <eth/broadcast/dr_broadcast.h>
 
+void test(){
+	uint32_t ipAddr = EthConfigureWithDHCP();
+
+	if(0 != ipAddr) {
+		printf("starting echo server...\n");
+		EchoStart();
+
+		printf("starting broadcast service... \n");
+		BroadcastStart();
+	} else {
+		printf("Ethernet setup failed... ");
+	}
+}
+
 int main(void) {
 	CPUirqd();
 	MmuInit();
@@ -30,30 +44,21 @@ int main(void) {
 	//ALWAYS CONFIGURE DELAY TIMER FIRST!
 	//AND ENABLE INTERRUPTS AFTERWARDS
 	TimerDelaySetup();
+
+	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
+	TimerEnable(Timer_TIMER2);
+
+	SchedulerStartProcess(&test);
+
 	CPUirqe();
 
-//	EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
-	EthConfigureWithDHCP();
+//	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
-
-	printf("starting echo server...\n");
-	EchoStart();
-
-	printf("starting broadcast service... \n");
-	BroadcastStart();
-
-	TimerDelaySetup();
-	LedInitRegister();
-	LedInit0();
 
 	while (1) {
-		TimerDelayDelay(500);
+		volatile int i = 0;
 
-		int ledStatus = GPIOPinRead(SOC_GPIO_1_REGS, LED0_PIN);
-		if (ledStatus) {
-			LedOff0();
-		} else {
-			LedOn0();
+		for (i = 0; i < 1000000; i++) {
 		}
 	}
 }
