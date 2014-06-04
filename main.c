@@ -26,9 +26,12 @@ int main(void) {
 
 	CPUirqd();
 
-		MmuInit();
+	MmuInit();
 
-		IntControllerInit();
+	IntControllerInit();
+
+	TimerConfiguration(Timer_TIMER2,2000,SchedulerRunNextProcess);
+	TimerEnable(Timer_TIMER2);
 
 	printf("started - now wait!\n");
 	uint32_t l = sizeof(Test) / sizeof(Test[0]);
