@@ -19,6 +19,8 @@
 #include <cpu/hw_cpu.h>
 #include <scheduler.h>
 #include <mmu/sc_mmu.h>
+#include <Syscall/lib_syscall.h>
+#include <swi/sc_swi.h>
 
 /****************************************************************************/
 /*                      INTERNAL MACRO DEFINITIONS                          */
@@ -100,10 +102,9 @@ int main(void) {
 
 	MmuInit();
 
-	printf("config timer\n");
-
 	IntControllerInit();
 
+	/*
 	LedInitRegister();
 	LedInit2();
 	LedInit3();
@@ -115,9 +116,16 @@ int main(void) {
 	SchedulerStartProcess(&switchLED2OFF);
 	SchedulerStartProcess(&switchLED3ON);
 	SchedulerStartProcess(&switchLED3OFF);
+	*/
 
 	printf("end config start interrupt\n");
 	CPUirqe();
+
+	SyscallArgData data;
+	data.swiNumber = 0;
+	data.arg1 = (uint32_t) "TestMessage\n";
+
+	Syscall(&data);
 
 	while (1) {
 		volatile int i = 0;
@@ -147,3 +155,4 @@ interrupt void fiq_handler() {
 interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
 }
+
