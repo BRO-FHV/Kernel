@@ -15,7 +15,6 @@
 #include <led/dr_led.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
-#include <sd/dr_sd.h>
 #include <scheduler.h>
 #include "Test.h"
 
@@ -68,13 +67,5 @@ interrupt void udef_handler() {
  */
 #pragma INTERRUPT(pabt_handler, PABT)
 interrupt void pabt_handler() {
-	printf("pabt interrupt\n");
-}
-
-/**
- * Is called on any data abort.
- */
-#pragma INTERRUPT(dabt_handler, DABT)
-interrupt void dabt_handler() {
-	printf("dabt interrupt\n");
+	printf("pabt interrupttfu\n");
 }
