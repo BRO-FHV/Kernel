@@ -27,12 +27,25 @@
 	.global	EXIT_RTN
 	.global __TI_auto_init
 
+	.global int_vecs
+	.global irqStack
+	.global kernelStack
+	.global abortStack
+	.global systemStack
+
 ;
 ; define constants
 ;
 _stackptr			.word	__STACK_END
 ABORT_STACK_SIZE 	.set    0x8
 IRQ_STACK_SIZE 		.set    0x1000
+
+c_sp_irq		.long	irqStack
+c_sp_kernel		.long	kernelStack
+c_sp_abort		.long	abortStack
+c_sp_system		.long	systemStack
+
+_int_vecs		.long 	int_vecs
 
 ;
 ; define arm mode masks
@@ -49,38 +62,39 @@ MODE_SYS			.set	0x1F
 ; Entry point function
 ;
 boot: .asmfunc
-	;
-	; adjust stack pointer
-	;
-	LDR		r0, _stackptr	; load address to stack pointer in r0
-	SUB		r0, r0, #8		; adjust sp
-	BIC		r0, r0, #7
+	;*------------------------------------------------------
+	;* Switch to IRQ Mode and store stack-pointer
+	;*------------------------------------------------------<
+	CPS		0x12
+	LDR     sp, c_sp_irq
 
-	;
-	; switch to irq mode and set sp
-	;
-	CPS		#MODE_IRQ
-	MOV		sp, r0						; set sp
-	SUB		r0, r0, #IRQ_STACK_SIZE		; adjust sp
+	;*------------------------------------------------------
+	;* Switch to Supervisor Mode and store stack-pointer
+	;*------------------------------------------------------
+	CPS		0x13
+	LDR     sp, c_sp_kernel
 
-	;
-	; switch to abort mode and set sp
-	;
-	CPS		#MODE_ABT
-	MOV     sp, r0						; set sp
-	SUB		r0, r0, #ABORT_STACK_SIZE	; adjust sp
+	;*------------------------------------------------------
+	;* Switch to ABT Mode and store stack-pointer
+	;*------------------------------------------------------
+	CPS		0x17
+	LDR     sp, c_sp_abort
 
-	;
-	; switch to sys mode
-	;
-	CPS		#MODE_SYS
-	MOV		sp, r0		; set sp
+	;*------------------------------------------------------
+	;* Switch to System Mode and Store stack-pointer
+	;*------------------------------------------------------
+	CPS		0x1F
+	LDR		sp, c_sp_system
+
+	; Interrupt Vectors base register
+	LDR R0, _int_vecs
+	MCR p15, #0, R0, c12, c0, #0
 
 	;
 	; Perform all the required initilizations:
 	;	* Process BINIT Table
 	;   * Perform C auto initialization
-	;   * Call global constructors
+	;   *	 Call global constructors
 	;
 	BL		__TI_auto_init
 
