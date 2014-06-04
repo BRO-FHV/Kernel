@@ -19,22 +19,8 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <mmu/sc_mmu.h>
+
 #include <eth/broadcast/dr_broadcast.h>
-
-void test(){
-	uint32_t ipAddr = EthConfigureWithDHCP();
-
-	if(0 != ipAddr) {
-		printf("starting echo server...\n");
-		EchoStart();
-
-		printf("starting broadcast service... \n");
-		BroadcastStart();
-	} else {
-		printf("Ethernet setup failed... ");
-	}
-}
-
 int main(void) {
 	CPUirqd();
 	MmuInit();
@@ -45,15 +31,25 @@ int main(void) {
 	//AND ENABLE INTERRUPTS AFTERWARDS
 	TimerDelaySetup();
 
-	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
+	TimerConfiguration(Timer_TIMER2, 20000, SchedulerRunNextProcess);
 	TimerEnable(Timer_TIMER2);
 
-	SchedulerStartProcess(&test);
+	//SchedulerStartProcess(&test);
 
 	CPUirqe();
 
 //	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
+	uint32_t ipAddr = EthConfigureWithDHCP();
+	if(0 != ipAddr) {
+		printf("starting echo server...\n");
+		EchoStart();
+
+		printf("starting broadcast service... \n");
+		BroadcastStart();
+	} else {
+		printf("Ethernet setup failed... ");
+	}
 
 	while (1) {
 		volatile int i = 0;
