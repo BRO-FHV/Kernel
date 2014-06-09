@@ -21,6 +21,7 @@
 #include <mmu/sc_mmu.h>
 #include <Syscall/lib_syscall.h>
 #include <swi/sc_swi.h>
+#include <basic.h>
 
 /****************************************************************************/
 /*                      INTERNAL MACRO DEFINITIONS                          */
@@ -52,6 +53,8 @@
 #define NUM_SECTIONS_DDR           (512)
 #define NUM_SECTIONS_DEV           (960)
 #define NUM_SECTIONS_OCMC          (1)
+
+void Delay(void);
 
 #pragma DATA_ALIGN(pageTable, 16384);
 static volatile unsigned int pageTable[4 * 1024];
@@ -106,26 +109,73 @@ int main(void) {
 
 	/*
 	LedInitRegister();
+	LedInit0();
+	LedInit1();
 	LedInit2();
 	LedInit3();
-
-	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
-	TimerEnable(Timer_TIMER2);
-
-	SchedulerStartProcess(&switchLED2ON);
-	SchedulerStartProcess(&switchLED2OFF);
-	SchedulerStartProcess(&switchLED3ON);
-	SchedulerStartProcess(&switchLED3OFF);
 	*/
+
+	SyscallArgData data17;
+	data17.swiNumber = 17;
+	Syscall(&data17);
+
+	/*
+	 TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
+	 TimerEnable(Timer_TIMER2);
+
+	 SchedulerStartProcess(&switchLED2ON);
+	 SchedulerStartProcess(&switchLED2OFF);
+	 SchedulerStartProcess(&switchLED3ON);
+	 SchedulerStartProcess(&switchLED3OFF);
+	 */
 
 	printf("end config start interrupt\n");
 	CPUirqe();
 
+
+	 SyscallArgData data45;
+	 data45.swiNumber = 0;
+	 char p[255]="\nHallo Franz\n";
+
+	 data45.arg1 = (uint32_t)  p;
+
+	Syscall(&data45);
+
+/*
 	SyscallArgData data;
-	data.swiNumber = 0;
-	data.arg1 = (uint32_t) "TestMessage\n";
+	data.swiNumber = 1;
+
+
 
 	Syscall(&data);
+
+	Delay();
+
+	SyscallArgData data2;
+	data2.swiNumber = 2;
+
+	Syscall(&data2);
+
+	Delay();
+
+	SyscallArgData data3;
+	data3.swiNumber = 5;
+
+	Syscall(&data3);
+
+	Delay();
+
+	SyscallArgData data4;
+	data4.swiNumber = 11;
+	data4.arg1 = SOC_GPIO_1_REGS;
+	data4.arg2 = LED1_PIN;
+
+	Syscall(&data4);
+
+	if (data4.result != 0) {
+		LedOn3();
+	}
+	*/
 
 	while (1) {
 		volatile int i = 0;
@@ -154,5 +204,12 @@ interrupt void fiq_handler() {
 #pragma INTERRUPT(pabt_handler, PABT)
 interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
+}
+
+void Delay(void) {
+	volatile int i = 0;
+
+	for (i = 0; i < 1000000; i++) {
+	}
 }
 
