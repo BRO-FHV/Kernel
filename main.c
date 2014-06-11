@@ -120,23 +120,6 @@ interrupt void fiq_handler() {
 	printf("fiq interrupt\n");
 }
 
-/**
- * Is called on any interrupt request.
- */
-#pragma INTERRUPT(irq_handler, IRQ)
-interrupt void irq_handler() {
-	printf("irq interrupt\n");
-	IntIRQHandler();
-}
-
-
-/**
- * Is called on any sw interrupt request.
- */
-#pragma INTERRUPT(swi_handler, IRQ)
-interrupt void swi_handler() {
-	printf("swi interrupt\n");
-}
 
 /**
  * Is called on any undefined error which caused an abort
@@ -154,10 +137,3 @@ interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
 }
 
-/**
- * Is called on any data abort.
- */
-#pragma INTERRUPT(dabt_handler, DABT)
-interrupt void dabt_handler() {
-	printf("dabt interrupt\n");
-}
