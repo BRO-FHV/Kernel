@@ -18,7 +18,7 @@
 #include <led/dr_led.h>
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
-//#include <mmu/sc_mmu.h>
+#include <mmu/sc_mmu.h>
 #include <eth/broadcast/dr_broadcast.h>
 #include <mmu/mmu.h>
 
@@ -44,8 +44,8 @@ static void MMUConfigAndEnable(void);
 
 int main(void) {
 	CPUirqd();
-//	MmuInit();
-    MMUConfigAndEnable();
+	MmuInit();
+    //MMUConfigAndEnable();
 
 	IntControllerInit();
 
@@ -100,7 +100,7 @@ interrupt void pabt_handler() {
 	printf("pabt interrupt\n");
 }
 
-void MMUConfigAndEnable(void)
+static void MMUConfigAndEnable(void)
 {
     /*
     ** Define DDR memory region of AM335x. DDR can be configured as Normal
