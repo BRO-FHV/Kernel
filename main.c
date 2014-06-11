@@ -109,7 +109,6 @@ int main(void) {
 	LedInit3();
 
 	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
-	TimerEnable(Timer_TIMER2);
 
 	SchedulerStartProcess(&switchLED2ON);
 	SchedulerStartProcess(&switchLED2OFF);
@@ -118,6 +117,8 @@ int main(void) {
 
 	printf("end config start interrupt\n");
 	CPUirqe();
+
+	TimerEnable(Timer_TIMER2);
 
 	while (1) {
 		volatile int i = 0;
