@@ -25,6 +25,7 @@
 #define LEN_IP_ADDR                        (4u)
 #define ASCII_NUM_IDX                      (48u)
 
+<<<<<<< HEAD
 #define START_ADDR_DDR                     (0x80000000)
 #define START_ADDR_DEV                     (0x44000000)
 #define START_ADDR_OCMC                    (0x40300000)
@@ -38,23 +39,106 @@
 /* Page tables start must be aligned in 16K boundary */
 #pragma DATA_ALIGN(pageTable, MMU_PAGETABLE_ALIGN_SIZE);
 static volatile unsigned int pageTable[MMU_PAGETABLE_NUM_ENTRY];
+=======
+void Timer1()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED0_PIN);
+	if(i==0)
+	{
+		LedOn0();
+	}
+	else
+	{
+		LedOff0();
+	}
+}
+
+void Timer2()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED1_PIN);
+	if(i==0)
+	{
+		LedOn1();
+	}
+	else
+	{
+		LedOff1();
+	}
+}
+
+void Timer3()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
+	if(i==0)
+	{
+		LedOn2();
+	}
+	else
+	{
+		LedOff2();
+	}
+}
+
+void Timer4()
+{
+	int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
+	if(i==0)
+	{
+		LedOn3();
+	}
+	else
+	{
+		LedOff3();
+	}
+}
+>>>>>>> ad789c5bef67aa9fa7ed16875b355030178ceb0e
 
 static void MMUConfigAndEnable(void);
 
 
+<<<<<<< HEAD
 int main(void) {
 	CPUirqd();
 //	MmuInit();
     MMUConfigAndEnable();
 
+=======
+>>>>>>> ad789c5bef67aa9fa7ed16875b355030178ceb0e
 	IntControllerInit();
 
 	LedInitRegister();
+	LedInit0();
+	LedOn0();
+
+	LedInit1();
 	LedInit2();
+	LedOn2();
+
 	LedInit3();
 
+<<<<<<< HEAD
 	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
+=======
+	//TimerConfiguration(Timer_TIMER1MS, 0, Timer1); //ms not needed
+	TimerConfiguration(Timer_TIMER2, 1000, Timer1);
+	TimerConfiguration(Timer_TIMER3, 2000, Timer2);
+	TimerConfiguration(Timer_TIMER4, 3000, Timer3);
+	TimerConfiguration(Timer_TIMER5, 4000, Timer4);
+
+	//further possible timers - THEY WORK!
+	//TimerConfiguration(Timer_TIMER6, 10000, Timer1);
+	//TimerConfiguration(Timer_TIMER7, 12000, Timer1);
+
+	//TimerEnable(Timer_TIMER1MS);
+>>>>>>> ad789c5bef67aa9fa7ed16875b355030178ceb0e
 	TimerEnable(Timer_TIMER2);
+	TimerEnable(Timer_TIMER3);
+	TimerEnable(Timer_TIMER4);
+	TimerEnable(Timer_TIMER5);
+
+	//further possible timers - THEY WORK!
+//	TimerEnable(Timer_TIMER6);
+//	TimerEnable(Timer_TIMER7);
 
 	SchedulerStartProcess(&switchLED2ON);
 	SchedulerStartProcess(&switchLED2OFF);
@@ -63,6 +147,7 @@ int main(void) {
 
 	CPUirqe();
 
+<<<<<<< HEAD
 	//uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 	uint32_t ipAddr = EthConfigureWithDHCP();
 	if(0 != ipAddr) {
@@ -75,6 +160,8 @@ int main(void) {
 		printf("Ethernet setup failed... ");
 	}
 
+=======
+>>>>>>> ad789c5bef67aa9fa7ed16875b355030178ceb0e
 	while (1) {
 		volatile int i = 0;
 
