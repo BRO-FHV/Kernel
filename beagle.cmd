@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Kernel: beagle.cmd
  * Part of BRO Project, 2014 <<https://github.com/BRO-FHV>>
@@ -7,6 +8,13 @@
  * Linker command file for BeagleBone
  * Basic linker options
  */
+=======
+////////////////////////////////////////////////////////
+// Linker command file for BeagleBone)				  //
+////////////////////////////////////////////////////////
+// Basic configuration using only external memory	  //
+////////////////////////////////////////////////////////
+>>>>>>> 225c44c2f3885322a2ba21cf9bdb3155f651fd3a
 
 /* heap and stack sizes */
 -stack           0x000F0000
@@ -32,14 +40,14 @@ SECTIONS
 		*(.intvecs)
 	}
 
-    .const      > ext_ddr
-    .bss        > ext_ddr
-    .far        > ext_ddr
+    .const      > DDR0
+    .bss        > DDR0
+    .far        > DDR0
 
-    .stack      > ext_ddr
-    .data       > ext_ddr
-    .cinit      > ext_ddr
-    .cio        > ext_ddr
+    .stack      > DDR0
+    .data       > DDR0
+    .cinit      > DDR0
+    .cio        > DDR0
 
     .text       > ext_ddr
     .sysmem     > ext_ddr
