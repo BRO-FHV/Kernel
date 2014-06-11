@@ -17,7 +17,7 @@
 #include <cpu/hw_cpu.h>
 #include <scheduler.h>
 #include "Test.h"
-
+#include <sd/dr_sd.h>
 
 
 
@@ -28,8 +28,10 @@ extern irq_handler(void);
 
 int main(void) {
 
+	void * headerBuff ;
 	CPUirqd();
 
+	startFileSystem();
 	MmuInit();
 
 	IntControllerInit();
@@ -38,8 +40,8 @@ int main(void) {
 	TimerEnable(Timer_TIMER2);
 
 	printf("started - now wait!\n");
-	uint32_t l = sizeof(Test) / sizeof(Test[0]);
-	loadProcessFromElf(l, Test);
+
+	loadProcessFromElf(0, Test);
 	CPUirqe();
 	while (1) {
 		volatile int i = 0;
