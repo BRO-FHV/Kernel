@@ -9,8 +9,8 @@
  */
 
 /* heap and stack sizes */
--stack           0x00002000
--heap            0x00F00000
+-stack           0x000F0000
+-heap            0x000F0000
 
 /* supress warning _c_int00 entry point */
 --diag_suppress=10063
@@ -22,7 +22,7 @@ MEMORY
 {
     int_ram:    o = 0x40200000  l = 0x0000FF4C
 	int_vecs:   o = 0x4030CE04  l = 0x00000100  	/* interrups exception mapping */
-    ext_ddr:    o = 0x80000000  l = 0x7FFFFFF		/* internal ram 128MB */
+    ext_ddr:    o = 0x80000000  l = 0x00FFFFFF		/* internal ram 128MB */
 }
 
 SECTIONS
@@ -47,13 +47,13 @@ SECTIONS
 
 	.stackarea  > ext_ddr {
 		. = align(4);
-		. = . + (4 * 1024);
+		. = . + (8 * 1024);
 		kernelStack = .;
-		. = . + (4 * 1024);
+		. = . + (8 * 1024);
 		irqStack = .;
-		. = . + (4 * 1024);
+		. = . + (8 * 1024);
 		systemStack = .;
-		. = . + (4 * 1024);
+		. = . + (8 * 1024);
 		abortStack = .;
 		ext_ddr_user_start = .;
 	}
