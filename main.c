@@ -132,6 +132,7 @@ int main(void) {
 	printf("end config start interrupt\n");
 	CPUirqe();
 
+	/*
 
 	 SyscallArgData data45;
 	 data45.swiNumber = 0;
@@ -140,8 +141,9 @@ int main(void) {
 	 data45.arg1 = (uint32_t)  p;
 
 	Syscall(&data45);
+	*/
 
-/*
+
 	SyscallArgData data;
 	data.swiNumber = 1;
 
@@ -175,7 +177,7 @@ int main(void) {
 	if (data4.result != 0) {
 		LedOn3();
 	}
-	*/
+
 
 	while (1) {
 		volatile int i = 0;
