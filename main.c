@@ -108,7 +108,7 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 20000, SchedulerRunNextProcess);
+	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 	TimerEnable(Timer_TIMER2);
 
 	SchedulerStartProcess(&switchLED2ON);
