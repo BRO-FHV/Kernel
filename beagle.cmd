@@ -32,14 +32,14 @@ SECTIONS
 		*(.intvecs)
 	}
 
-    .const      > DDR0
-    .bss        > DDR0
-    .far        > DDR0
+    .const      > ext_ddr
+    .bss        > ext_ddr
+    .far        > ext_ddr
 
-    .stack      > DDR0
-    .data       > DDR0
-    .cinit      > DDR0
-    .cio        > DDR0
+    .stack      > ext_ddr
+    .data       > ext_ddr
+    .cinit      > ext_ddr
+    .cio        > ext_ddr
 
     .text       > ext_ddr
     .sysmem     > ext_ddr
