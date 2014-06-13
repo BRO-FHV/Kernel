@@ -25,6 +25,10 @@
 /****************************************************************************/
 #define UART_THR_RHR_REG           (SOC_UART_0_REGS)
 
+#include "Test.h"
+#include <sd/dr_sd.h>
+
+
 #define MAX_ACNT                   (1u)
 #define MAX_CCNT                   (1u)
 
@@ -96,8 +100,10 @@ void switchLED3OFF() {
 
 int main(void) {
 
+	void * headerBuff ;
 	CPUirqd();
 
+	startFileSystem();
 	MmuInit();
 
 	printf("config timer\n");
@@ -110,12 +116,12 @@ int main(void) {
 
 	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 
-	SchedulerStartProcess(&switchLED2ON);
-	SchedulerStartProcess(&switchLED2OFF);
-	SchedulerStartProcess(&switchLED3ON);
-	SchedulerStartProcess(&switchLED3OFF);
 
 	printf("end config start interrupt\n");
+
+
+	loadProcessFromElf(0, Test);
+
 	CPUirqe();
 
 	TimerEnable(Timer_TIMER2);
