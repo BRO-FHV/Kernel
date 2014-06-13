@@ -59,8 +59,8 @@ int main(void) {
 
 	CPUirqe();
 
-	//uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
-	uint32_t ipAddr = EthConfigureWithDHCP();
+	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
+	//uint32_t ipAddr = EthConfigureWithDHCP();
 	if(0 != ipAddr) {
 		printf("starting echo server...\n");
 		EchoStart();
