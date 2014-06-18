@@ -19,9 +19,9 @@
 #include "Test.h"
 #include "Test2.h"
 #include <sd/dr_sd.h>
-
-
-
+#include <elf/dr_elfloader.h>
+#include <inttypes.h>
+#include <sd/thirdParty/fatfs/src/ff.h>
 
 #include <mmu/sc_mmu.h>
 
@@ -29,7 +29,7 @@ extern irq_handler(void);
 
 int main(void) {
 
-	void * headerBuff ;
+
 	CPUirqd();
 
 
@@ -44,11 +44,20 @@ int main(void) {
 
 
 	printf("started - now wait!\n");
-
-	loadProcessFromElf(0, Test);
+	startFileSystem();
+	CPUirqe();
+	FILINFO fi;
+	if(f_stat("Test.out",&fi) == FR_OK)
+	{
+		uint8_t *dataBuf = (uint8_t*)malloc(fi.fsize);
+		getElfFile(dataBuf, fi.fsize, "Test.out");
+		loadProcessFromElf(0, dataBuf);
+		free(dataBuf);
+		//loadProcessFromElf(0, Test);
+	}
 	loadProcessFromElf(0, Test2);
 	TimerConfiguration(Timer_TIMER2,2000,SchedulerRunNextProcess);
-	CPUirqe();
+	//CPUirqe();
 	TimerEnable(Timer_TIMER2);
 	while (1) {
 		volatile int i = 0;
