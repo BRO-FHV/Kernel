@@ -52,6 +52,7 @@ int main(void) {
 	//AND ENABLE INTERRUPTS AFTERWARDS
 	TimerDelaySetup();
 
+
 	CPUirqe();
 
 	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
@@ -66,6 +67,8 @@ int main(void) {
 		SchedulerStartProcess(&udp_echo);
 
 		CPUirqe();
+		TimerEnable(Timer_TIMER2);
+
 
 		while (1) {
 			volatile int i = 0;
