@@ -26,14 +26,14 @@
 #define PORT 2000
 
 void udp_echo() {
-	broUdpInit(PORT);
+	BroUdpInit(PORT);
 
-	while(1) {
-		if(broUdpHasData(PORT)) {
+	while (1) {
+		if (BroUdpHasData(PORT)) {
 			printf("echo\n");
 
-			upd_package_t* package = broUdpGetData(PORT);
-			broUdpSendData(package->sender, PORT, package->data, package->len);
+			upd_package_t* package = BroUdpGetData(PORT);
+			BroUdpSendData(package->sender, PORT, package->data, package->len);
 
 			free(package->data);
 			package->data = NULL;
@@ -58,23 +58,25 @@ int main(void) {
 
 	if(0 != ipAddr) {
 		printf("start listening\n");
-	} else {
-		printf("Ethernet setup failed... ");
-	}
 
-	CPUirqd();
+		CPUirqd();
 
-	TimerConfiguration(Timer_TIMER2, 2000, SchedulerRunNextProcess);
-	TimerEnable(Timer_TIMER2);
-	SchedulerStartProcess(&udp_echo);
+		TimerConfiguration(Timer_TIMER2, 2000, SchedulerRunNextProcess);
+		TimerEnable(Timer_TIMER2);
+		SchedulerStartProcess(&udp_echo);
 
-	CPUirqe();
+		CPUirqe();
 
-	while (1) {
-		volatile int i = 0;
+		while (1) {
+			volatile int i = 0;
 
-		for (i = 0; i < 1000000; i++) {
+			for (i = 0; i < 1000000; i++) {
+			}
 		}
+	} else {
+		printf("Ethernet setup failed... \n");
+		printf("Shut down... \n");
+
 	}
 }
 
