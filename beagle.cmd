@@ -20,7 +20,7 @@
 
 MEMORY
 {
-    int_ram:    o = 0x40200000  l = 0x0000FF4C
+    int_ram:    o = 0x402F0400  l = 0x0000FF4C
 	int_vecs:   o = 0x4030CE04  l = 0x00000100  	/* interrups exception mapping */
     ext_ddr:    o = 0x80000000  l = 0x7FFFFFF		/* internal ram 128MB */
 }
@@ -31,6 +31,8 @@ SECTIONS
 		int_vecs = .;
 		*(.intvecs)
 	}
+
+	.interrupts	> int_ram
 
     .const      > ext_ddr
     .bss        > ext_ddr
