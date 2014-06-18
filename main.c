@@ -17,6 +17,7 @@
 #include <cpu/hw_cpu.h>
 #include <scheduler.h>
 #include "Test.h"
+#include "Test2.h"
 #include <sd/dr_sd.h>
 
 
@@ -31,18 +32,24 @@ int main(void) {
 	void * headerBuff ;
 	CPUirqd();
 
-	startFileSystem();
+
+	LedInitRegister();
+	LedInit1();
+	LedInit2();
 	MmuInit();
 
 	IntControllerInit();
 
-	TimerConfiguration(Timer_TIMER2,2000,SchedulerRunNextProcess);
-	TimerEnable(Timer_TIMER2);
+
+
 
 	printf("started - now wait!\n");
 
 	loadProcessFromElf(0, Test);
+	loadProcessFromElf(0, Test2);
+	TimerConfiguration(Timer_TIMER2,2000,SchedulerRunNextProcess);
 	CPUirqe();
+	TimerEnable(Timer_TIMER2);
 	while (1) {
 		volatile int i = 0;
 
