@@ -58,9 +58,6 @@ void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i == 0) {
-			uint32_t* x = (uint32_t*) 0x81200000;
-			*x = 5;
-			printf("x: %p, *x: %d, i: %d\n", x, *x, i);
 			LedOn2();
 		}
 	}
@@ -69,9 +66,6 @@ void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i != 0) {
-			uint32_t* x = (uint32_t*) 0x81200000;
-			*x = 10;
-			printf("x: %p, *x: %d, i: %d\n", x, *x, i);
 			LedOff2();
 		}
 	}
@@ -108,8 +102,7 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 20000, SchedulerRunNextProcess);
-	TimerEnable(Timer_TIMER2);
+	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 
 	SchedulerStartProcess(&switchLED2ON);
 	SchedulerStartProcess(&switchLED2OFF);
@@ -118,6 +111,8 @@ int main(void) {
 
 	printf("end config start interrupt\n");
 	CPUirqe();
+
+	TimerEnable(Timer_TIMER2);
 
 	while (1) {
 		volatile int i = 0;
