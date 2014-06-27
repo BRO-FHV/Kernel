@@ -22,25 +22,8 @@
 #include <mmu/sc_mmu.h>
 #include <eth/broadcast/dr_broadcast.h>
 #include <eth/dr_eth_udp.h>
-
-#define PORT 2000
-
-void udp_echo() {
-	BroUdpInit(PORT);
-
-	while (1) {
-		if (BroUdpHasData(PORT)) {
-			printf("echo\n");
-
-			upd_package_t* package = BroUdpGetData(PORT);
-			BroUdpSendData(package->sender, PORT, package->data, package->len);
-
-			free(package->data);
-			package->data = NULL;
-			package->len = 0;
-		}
-	}
-}
+#include <sd/thirdParty/fatfs/src/ff.h>
+#include <sd/dr_sd.h>
 
 int main(void) {
 	CPUirqd();
@@ -52,23 +35,31 @@ int main(void) {
 	//AND ENABLE INTERRUPTS AFTERWARDS
 	TimerDelaySetup();
 
+	CPUirqe();
+
+	// load elf
+	startFileSystem();
+	FILINFO fi;
+
+	if (f_stat("BRO_UDP.out", &fi) == FR_OK) {
+		uint8_t* dataBuff = malloc(fi.fsize);
+		getElfFile(dataBuff, fi.fsize, "BRO_UDP.out");
+
+		// start a process
+		loadProcessFromElf(0, dataBuff);
+		free(dataBuff);
+	}
 
 	CPUirqe();
 
 	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
-	if(0 != ipAddr) {
+	if (0 != ipAddr) {
 		printf("start listening\n");
 
-		CPUirqd();
-
-		TimerConfiguration(Timer_TIMER2, 2000, SchedulerRunNextProcess);
+		// init timer
+		TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 		TimerEnable(Timer_TIMER2);
-		SchedulerStartProcess(&udp_echo);
-
-		CPUirqe();
-		TimerEnable(Timer_TIMER2);
-
 
 		while (1) {
 			volatile int i = 0;
@@ -79,7 +70,9 @@ int main(void) {
 	} else {
 		printf("Ethernet setup failed... \n");
 		printf("Shut down... \n");
+		while(1) {
 
+		}
 	}
 }
 
