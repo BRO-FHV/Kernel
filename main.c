@@ -20,14 +20,18 @@
 #include <soc_AM335x.h>
 #include <cpu/hw_cpu.h>
 #include <mmu/sc_mmu.h>
-#include <eth/broadcast/dr_broadcast.h>
-#include <eth/dr_eth_udp.h>
 #include <sd/thirdParty/fatfs/src/ff.h>
 #include <sd/dr_sd.h>
 
 int main(void) {
 	CPUirqd();
 	MmuInit();
+
+	LedInitRegister();
+	LedInit0();
+	LedInit1();
+	LedInit2();
+	LedInit3();
 
 	IntControllerInit();
 
@@ -70,7 +74,7 @@ int main(void) {
 	} else {
 		printf("Ethernet setup failed... \n");
 		printf("Shut down... \n");
-		while(1) {
+		while (1) {
 
 		}
 	}
