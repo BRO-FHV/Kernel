@@ -26,6 +26,74 @@
 #include <Led/lib_led.h>
 #include <stdlib/stdlib.h>
 
+#define PORT					2000
+#define LENGTH_USERNAME 		7 //Byte
+#define CMD_LED					1
+
+uint8_t BROADCAST_IP[] = { 255, 255, 255, 255 };
+
+typedef struct {
+	uint8_t username[LENGTH_USERNAME];
+	uint8_t cmd;
+} tCmd;
+
+typedef struct {
+	tCmd cmd;
+	uint8_t led;
+	uint8_t state;
+} tCmd_Led;
+
+/*
+ * main.c
+ */
+int asdf(void) {
+	BroUdpInit(PORT);
+
+	while (1) {
+		if (BroUdpHasData(PORT)) {
+			udp_package_t* package = BroUdpGetData(PORT);
+			tCmd* command = (tCmd*) (package->data);
+
+			if (CMD_LED == command->cmd) {
+				tCmd_Led* ledCmd = (tCmd_Led*) (package->data);
+
+				if (ledCmd->led >= 1 && ledCmd->led <= 4) {
+					switch (ledCmd->led) {
+					case 2:
+						if (ledCmd->state) {
+							LedOn1();
+						} else {
+							LedOff1();
+						}
+						break;
+					case 3:
+						if (ledCmd->state) {
+							LedOn2();
+						} else {
+							LedOff2();
+						}
+						break;
+					case 4:
+						if (ledCmd->state) {
+							LedOn3();
+						} else {
+							LedOff3();
+						}
+						break;
+					}
+
+					//BROADCAST TO ALL LISTENERS
+					BroUdpSendData(BROADCAST_IP, PORT, package->data, package->len);
+				}
+			}
+
+			free(package->data);
+			package->data = NULL;
+			package->len = 0;
+		}
+	}
+}
+
 int main(void) {
 	CPUirqd();
 	MmuInit();
@@ -45,23 +113,25 @@ int main(void) {
 	CPUirqe();
 
 	// load elf
-	startFileSystem();
-	FILINFO fi;
-
-	if (f_stat("BRO_UDP.out", &fi) == FR_OK) {
-		uint8_t* dataBuff = malloc(fi.fsize);
-		getElfFile(dataBuff, fi.fsize, "BRO_UDP.out");
-
-		// start a process
-		loadProcessFromElf(0, dataBuff);
-		free(dataBuff);
-	}
+//	startFileSystem();
+//	FILINFO fi;
+//
+//	if (f_stat("BRO_UDP.out", &fi) == FR_OK) {
+//		uint8_t* dataBuff = malloc(fi.fsize);
+//		getElfFile(dataBuff, fi.fsize, "BRO_UDP.out");
+//
+//		// start a process
+//		loadProcessFromElf(0, dataBuff);
+//		free(dataBuff);
+//	}
 
 	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
 	if (0 != ipAddr) {
 		printf("start listening\n");
 		// init timer
+		SchedulerStartProcess(asdf);
+
 		TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 		TimerEnable(Timer_TIMER2);
 
