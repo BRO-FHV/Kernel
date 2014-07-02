@@ -58,6 +58,7 @@ void switchLED2ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i == 0) {
+			printf("LED %d ON\n", 2);
 			LedOn2();
 		}
 	}
@@ -66,6 +67,7 @@ void switchLED2OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED2_PIN);
 		if (i != 0) {
+			printf("LED %d OFF\n", 2);
 			LedOff2();
 		}
 	}
@@ -75,6 +77,7 @@ void switchLED3ON() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
 		if (i == 0) {
+			printf("LED %d ON\n", 3);
 			LedOn3();
 		}
 	}
@@ -83,6 +86,7 @@ void switchLED3OFF() {
 	while (1) {
 		int i = GPIOPinRead(SOC_GPIO_1_REGS, LED3_PIN);
 		if (i != 0) {
+			printf("LED %d OFF\n", 3);
 			LedOff3();
 		}
 	}
@@ -102,7 +106,7 @@ int main(void) {
 	LedInit2();
 	LedInit3();
 
-	TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
+	TimerConfiguration(Timer_TIMER2, 3000, SchedulerRunNextProcess);
 
 	SchedulerStartProcess(&switchLED2ON);
 	SchedulerStartProcess(&switchLED2OFF);
