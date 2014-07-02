@@ -27,6 +27,8 @@
 #include <stdlib/stdlib.h>
 #include <Eth/lib_eth.h>
 
+#include <list/linkedlist.h>
+
 #define PORT					2000
 #define LENGTH_USERNAME 		7 //Byte
 #define CMD_LED					1
@@ -166,24 +168,24 @@ int main(void) {
 	CPUirqe();
 
 	// load elf
-//	startFileSystem();
-//	FILINFO fi;
-//
-//	if (f_stat("BRO_UDP.out", &fi) == FR_OK) {
-//		uint8_t* dataBuff = malloc(fi.fsize);
-//		getElfFile(dataBuff, fi.fsize, "BRO_UDP.out");
-//
-//		// start a process
-//		loadProcessFromElf(0, dataBuff);
-//		free(dataBuff);
-//	}
+	startFileSystem();
+	FILINFO fi;
+
+	if (f_stat("BRO_UDP.out", &fi) == FR_OK) {
+		uint8_t* dataBuff = malloc(fi.fsize);
+		getElfFile(dataBuff, fi.fsize, "BRO_UDP.out");
+
+		// start a process
+		loadProcessFromElf(0, dataBuff);
+		free(dataBuff);
+	}
 
 	uint32_t ipAddr = EthConfigureWithIP(0xC0A80007u); //0xC0A80007u => 192.168.0.7
 
 	if (0 != ipAddr) {
 		printf("start listening\n");
 		// init timer
-		SchedulerStartProcess(asdf);
+		//SchedulerStartProcess(asdf);
 
 		TimerConfiguration(Timer_TIMER2, 1000, SchedulerRunNextProcess);
 		TimerEnable(Timer_TIMER2);
