@@ -25,6 +25,7 @@
 
 #include <Led/lib_led.h>
 #include <stdlib/stdlib.h>
+#include <Eth/lib_eth.h>
 
 #define PORT					2000
 #define LENGTH_USERNAME 		7 //Byte
@@ -46,6 +47,8 @@ typedef struct {
 /*
  * main.c
  */
+
+/*
 int asdf(void) {
 	BroUdpInit(PORT);
 
@@ -88,6 +91,56 @@ int asdf(void) {
 			}
 
 			free(package->data);
+			package->data = NULL;
+			package->len = 0;
+		}
+	}
+}
+*/
+
+
+int asdf(void) {
+	lib_udp_init(PORT);
+
+	while (1) {
+		if (lib_udp_has_data(PORT)) {
+			lib_udp_package_t* package = lib_udp_get_data(PORT);
+			tCmd* command = (tCmd*) (package->data);
+
+			if (CMD_LED == command->cmd) {
+				tCmd_Led* ledCmd = (tCmd_Led*) (package->data);
+
+				if (ledCmd->led >= 1 && ledCmd->led <= 4) {
+					switch (ledCmd->led) {
+					case 2:
+						if (ledCmd->state) {
+							lib_led_on_1();
+						} else {
+							lib_led_off_1();
+						}
+						break;
+					case 3:
+						if (ledCmd->state) {
+							lib_led_on_2();
+						} else {
+							lib_led_off_2();
+						}
+						break;
+					case 4:
+						if (ledCmd->state) {
+							lib_led_on_3();
+						} else {
+							lib_led_off_3();
+						}
+						break;
+					}
+
+					//BROADCAST TO ALL LISTENERS
+					lib_udp_send_data(BROADCAST_IP, PORT, package->data, package->len);
+				}
+			}
+
+			lib_free(package->data);
 			package->data = NULL;
 			package->len = 0;
 		}
